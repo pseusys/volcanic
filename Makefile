@@ -1,5 +1,4 @@
 .ONESHELL:
-.EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := help
 
 SHELL = /bin/bash
@@ -13,7 +12,7 @@ help:
 venv:
 	python3 -m venv venv
 	pip3 install --upgrade pip
-	pip3 install numpy Pillow PyOpenGL PyOpenGL-accelerate glfw cython AssimpCy
+	pip3 install -r requirements.txt
 
 run: venv
 	python3 sources/viewer.py assets/suzanne.obj
