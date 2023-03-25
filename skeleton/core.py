@@ -1,5 +1,4 @@
 # Python built-in modules
-from math import sin, cos, pi
 import os                           # os function, i.e. checking file status
 from itertools import cycle         # allows easy circular choice list
 import atexit                       # launch a function at exit
@@ -12,7 +11,6 @@ import assimpcy                     # 3D resource loader
 
 # our transform functions
 from transform import Trackball, identity
-from animation import *
 
 # initialize and automatically terminate glfw on exit
 glfw.init()
@@ -381,15 +379,12 @@ class Viewer(Node):
 
             win_size = glfw.get_window_size(self.win)
 
-            light_dir = (sin(glfw.get_time() * pi), 1, cos(glfw.get_time() * pi))
-
             # draw our scene objects
             cam_pos = np.linalg.inv(self.trackball.view_matrix())[:, 3]
             self.draw(view=self.trackball.view_matrix(),
                       projection=self.trackball.projection_matrix(win_size),
                       model=identity(),
-                      w_camera_position=cam_pos,
-                      light_dir=light_dir)
+                      w_camera_position=cam_pos)
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)
