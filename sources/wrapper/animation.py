@@ -68,5 +68,15 @@ class KeyFrameControlNode(Node):
 
 
 class Skinned:
-    # TODO: implement
-    pass
+    """ Skinned mesh decorator, passes bone world transforms to shader """
+    def __init__(self, mesh, bone_nodes, bone_offsets):
+        self.mesh = mesh
+
+        # store skinning data
+        self.bone_nodes = bone_nodes
+        self.bone_offsets = np.array(bone_offsets, np.float32)
+
+    def draw(self, **uniforms):
+        world_transforms = [node.world_transform for node in self.bone_nodes]
+        uniforms['bone_matrix'] = world_transforms @ self.bone_offsets
+        self.mesh.draw(**uniforms)
