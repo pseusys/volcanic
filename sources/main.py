@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from core import Shader, Viewer, load
+from sources.wrapper import Shader, Viewer, load
 
 
 # -------------- main program and scene setup --------------------------------
