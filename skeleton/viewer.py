@@ -39,7 +39,7 @@ class SkinnedCylinder(KeyFrameControlNode):
         forearm.add(hand)
     
 
-        # there are two bones in this animation corresponding to above noes
+        # there are three bones in this animation corresponding to above noes
         bone_nodes = [self, self.children[0], forearm.children[0]]
 
         # these bones have no particular offset transform
