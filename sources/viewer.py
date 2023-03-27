@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from core import Shader, Viewer, load
+from pointanimation import *
 
 
 # -------------- main program and scene setup --------------------------------
@@ -15,6 +16,11 @@ def main():
         print('Usage:\n\t%s [3dfile]*\n\n3dfile\t\t the filename of a model in'
               ' format supported by assimp.' % (sys.argv[0],))
 
+    
+    viewer.add(PointAnimation(shader))
+
+    # start rendering loop
+    viewer.run()
     # start rendering loop
     viewer.run()
 
