@@ -13,7 +13,7 @@ from .node import Node
 class Viewer(Node):
     """ GLFW viewer window, with classic initialization & graphics loop """
 
-    def __init__(self, width=640, height=480):
+    def __init__(self, width=640, height=480, distance=10):
         super().__init__()
 
         # version hints: create GL window with >= OpenGL 3.3 and core profile
@@ -28,7 +28,7 @@ class Viewer(Node):
         glfw.make_context_current(self.win)
 
         # initialize trackball
-        self.trackball = Trackball()
+        self.trackball = Trackball(distance=distance)
         self.mouse = (0, 0)
 
         # register event handlers
