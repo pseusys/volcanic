@@ -4,6 +4,7 @@ from bisect import bisect_left      # search sorted keyframe lists
 # External, non built-in modules
 import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import glfw                         # lean window system wrapper for OpenGL
+import numpy as np
 
 from sources.utils import lerp, quaternion_slerp, quaternion_matrix, translate, scale, identity
 
@@ -68,5 +69,15 @@ class KeyFrameControlNode(Node):
 
 
 class Skinned:
-    # TODO: implement
-    pass
+    """ Skinned mesh decorator, passes bone world transforms to shader """
+    def __init__(self, mesh, bone_nodes, bone_offsets):
+        self.mesh = mesh
+
+        # store skinning data
+        self.bone_nodes = bone_nodes
+        self.bone_offsets = np.array(bone_offsets, np.float32)
+
+    def draw(self, **uniforms):
+        world_transforms = [node.world_transform for node in self.bone_nodes]
+        uniforms['bone_matrix'] = world_transforms @ self.bone_offsets
+        self.mesh.draw(**uniforms)
