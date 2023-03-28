@@ -58,9 +58,15 @@ class Terrain(Mesh):
                     normals[vertex] += [even_normal]
 
         index = np.array(index, dtype=np.uint32)
-        for idx in range(len(normals)):
-            normals[idx] = np.average(normals[idx], axis=0)
+        for index in range(len(normals)):
+            normals[index] = np.average(normals[index], axis=0)
 
-        uniforms = dict(k_d=(1, 1, 1), k_s=(1, 1, 1), k_a=(0, 0, 0), s=16.)
-        attributes = dict(position=position, normal=normals)
+        uniforms = dict(
+            k_d=(1, 1, 1),
+            k_s=(1, 1, 1),
+            k_a=(0, 0, 0),
+            s=16.,
+        )
+
+        attributes = dict(position=position, color=color, normal=normals)
         super().__init__(shader, index=index, attributes=attributes, **uniforms)
