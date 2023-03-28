@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 import sys
+from typing import Callable
 
 import numpy as np
+from perlin_noise import PerlinNoise
 
 from sources.objects import Terrain
 from sources.wrapper import Shader, Viewer
-from perlin_noise import PerlinNoise
+from sources.utils import empty_grid, laplacian_of_gaussian
 
 
-def perlin_generator(noise: PerlinNoise, x: float, z: float) -> float:
-    return noise([x, z])
+def terrain_generator(carrier_func: Callable[[float, float], float], noise_func: Callable[[float, float], float], size_x: int, size_z: int, carrier_value: float = 5., noise_value: float = 1.):
+    carrier = empty_grid(size_x, size_z)
+    noise = empty_grid(size_x, size_z)
 
+    for x in range(-size_x // 2, size_x // 2):
+        for z in range(-size_z // 2, size_z // 2):
+            idx = (x + size_x // 2) * size_x + (z + size_z // 2)
+            carrier[idx] = carrier_func(x, z)
+            noise[idx] = noise_func(x / size_x, z / size_z)
 
-def carrier_generator(noise: PerlinNoise, x: float, z: float) -> float:
-    return noise([x, z])
+    height_matrix = carrier_value * np.array(carrier, dtype=np.float64) + noise_value * np.array(noise, dtype=np.float64)
 
-
-def terrain_generator(noise: PerlinNoise, size_x: int, size_y: int, size_z: int):
-    # carrier = [-x ** 4 + 0.5 * x ** 3 + 3 * x ** 2 - x + 4 for x in range(size_x) for _ in range(size_z)]
-    perlin = [perlin_generator(noise, x / size_x, z / size_z) for x in range(size_x) for z in range(size_z)]
-    height_matrix = np.array(perlin, dtype=np.float64)  # + 5 * np.array(carrier, dtype=np.float64)
-    height_matrix = (height_matrix - np.min(height_matrix)) / (np.max(height_matrix) - np.min(height_matrix)) * size_y
-
-    def generator(x: int, z: int) -> float:
-        return height_matrix[x * size_x + z]
+    def generator(xc: int, zc: int) -> float:
+        return height_matrix[xc * size_x + zc]
 
     return generator
 
@@ -35,10 +35,17 @@ def main():
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
 
     noise = PerlinNoise(octaves=15, seed=1)
+    laplacian_sigma = 5
     xpix, ypix, zpix = 100, 10, 100
 
-    generator = terrain_generator(noise, xpix, ypix, zpix)
-    # viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file, shader)])
+    generator = terrain_generator(
+        lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma),
+        lambda x, z: noise([x, z]),
+        xpix,
+        zpix,
+        50000.,
+        1.
+    )
     viewer.add(Terrain(shader, xpix, ypix, zpix, generator=generator))
 
     if len(sys.argv) != 2:

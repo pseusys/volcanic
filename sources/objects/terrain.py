@@ -1,17 +1,13 @@
-from typing import Tuple, Callable, Optional, List
+from typing import Tuple, Callable, Optional
 
 import numpy as np
 
 from ..wrapper import Shader, Mesh
-from ..utils import triangle_normal
+from ..utils import triangle_normal, empty_grid
 
 
 def _flat_gen(_: int, __: int) -> float:
     return 0.0
-
-
-def _empty_grid(x: int, z: int, init: Callable = lambda: None) -> List:
-    return [init() for _ in range(x * z)]
 
 
 class Terrain(Mesh):
@@ -25,19 +21,14 @@ class Terrain(Mesh):
         start_x = center[0] - size_x // 2
         start_z = center[2] - size_z // 2
 
-        position = _empty_grid(size_x, size_z)
-        color = _empty_grid(size_x, size_z)
+        position = empty_grid(size_x, size_z)
         for x in range(size_x):
             for z in range(size_z):
-                idx = x * size_x + z
-                height = generator(x, z)
-                position[idx] = (start_x + x, height, start_z + z)
-                color[idx] = (0, height / size_y, 0)
+                position[x * size_x + z] = (start_x + x, generator(x, z), start_z + z)
         position = np.array(position, dtype=np.float64)
-        color = np.array(color, dtype=np.float64)
 
         index = list()
-        normals = _empty_grid(size_x, size_z, init=list)
+        normals = empty_grid(size_x, size_z, init=list)
         for x in range(size_x - 1):
             for z in range(size_z - 1):
                 vci = x * size_x + z  # Vertex current index
