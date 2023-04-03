@@ -43,7 +43,7 @@ def main():
         lambda x, z: noise([x, z]),
         xpix,
         zpix,
-        50000.,
+        50.,
         1.
     )
     viewer.add(Terrain(shader, xpix, ypix, zpix, generator=generator))

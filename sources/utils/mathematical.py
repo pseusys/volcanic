@@ -9,6 +9,6 @@ def triangle_normal(v1, v2, v3):
     return norm / np.linalg.norm(norm)
 
 
-def laplacian_of_gaussian(x: float, z: float, sigma: float = 1.) -> float:
-    term = - (x ** 2 + z ** 2) / (2 * sigma ** 2)
-    return - (1 + term) * exp(term) / (pi * sigma ** 4)
+def laplacian_of_gaussian(x: float, z: float, sigma: float = 1., width: float = .3, height: float = 20., flatness: float = 100.) -> float:
+    term = - width * (x ** 2 + z ** 2) / (2 * sigma ** 2)
+    return - (1 + term * height) * exp(term) / (pi * sigma ** 4) * flatness
