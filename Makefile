@@ -15,7 +15,7 @@ venv:
 	pip3 install -r requirements.txt
 
 run: venv
-	python3 -m sources.main assets/suzanne.obj
+	python3 -m sources.main
 .PHONY: run
 
 clean:
