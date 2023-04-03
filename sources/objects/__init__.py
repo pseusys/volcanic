@@ -1,2 +1,2 @@
-from .cube import Cube
+from .tree import Tree
 from .terrain import Terrain

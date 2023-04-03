@@ -21,6 +21,7 @@ class Viewer(Node):
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL.GL_TRUE)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+        glfw.window_hint(glfw.SAMPLES, 4)
         glfw.window_hint(glfw.RESIZABLE, True)
         self.win = glfw.create_window(width, height, 'Viewer', None, None)
 

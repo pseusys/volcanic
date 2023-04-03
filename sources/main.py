@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
+import random
 import sys
 from typing import Callable
 
 import numpy as np
 from perlin_noise import PerlinNoise
 
-from sources.objects import Terrain
+from sources.objects import Terrain, Tree
 from sources.wrapper import Shader, Viewer
 from sources.utils import empty_grid, laplacian_of_gaussian
 
 
 def terrain_generator(carrier_func: Callable[[float, float], float], noise_func: Callable[[float, float], float], size_x: int, size_z: int, carrier_value: float = 5., noise_value: float = 1.):
-    carrier = empty_grid(size_x, size_z)
-    noise = empty_grid(size_x, size_z)
+    carrier = empty_grid(x=size_x, z=size_z)
+    noise = empty_grid(x=size_x, z=size_z)
 
     for x in range(-size_x // 2, size_x // 2):
         for z in range(-size_z // 2, size_z // 2):
@@ -36,7 +37,7 @@ def main():
 
     noise = PerlinNoise(octaves=15, seed=1)
     laplacian_sigma = 5
-    xpix, ypix, zpix = 100, 10, 100
+    xpix, zpix = 100, 100
 
     generator = terrain_generator(
         lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma),
@@ -46,7 +47,12 @@ def main():
         50.,
         1.
     )
-    viewer.add(Terrain(shader, xpix, ypix, zpix, generator=generator))
+    terrain = Terrain(shader, xpix, zpix, generator=generator)
+    viewer.add(terrain)
+    for i in range(50):
+        x = random.randint(5, xpix - 5)
+        z = random.randint(5, zpix - 5)
+        viewer.add(Tree(shader, x, z, terrain, 3))
 
     if len(sys.argv) != 2:
         print('Usage:\n\t%s [3dfile]*\n\n3dfile\t\t the filename of a model in format supported by assimp.' % (sys.argv[0],))
