@@ -12,7 +12,8 @@ class TextureCubeMap:
 
         try:
             for i, ftype in enumerate(tex_files):
-                filename = f"assets/skyBox/sky_{ftype}.png"
+                # filename = f"assets/skyBox/sky_{ftype}.png"
+                filename = f"assets/Daylight Box_Pieces/Daylight Box_{ftype}.bmp"
 
                 # imports image as a numpy array in exactly right format
                 tex = Image.open(filename).convert('RGBA')

@@ -41,8 +41,6 @@ def load(file, shader, tex_file=None, **params):
             tfile = None
         if Texture is not None and tfile:
             mat.properties['diffuse_map'] = Texture(tex_file=tfile)
-        if TextureCubeMap is not None:
-            mat.properties['skyBox'] = TextureCubeMap()
 
     # ----- load animations
     def conv(assimp_keys, ticks_per_second):
@@ -126,9 +124,6 @@ def load(file, shader, tex_file=None, **params):
 
         if Textured is not None and 'diffuse_map' in mat:
             new_mesh = Textured(new_mesh, diffuse_map=mat['diffuse_map'])
-
-        # if TexturedCubeMap is not None and 'skyBox' in mat:
-        #     new_mesh = TexturedCubeMap(new_mesh, skyBox=mat['skyBox'])
 
         if Skinned and mesh.HasBones:
             # make bone lookup array & offset matrix, indexed by bone index (id)
