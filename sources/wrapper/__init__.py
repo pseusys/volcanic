@@ -12,3 +12,4 @@ from .mesh import Mesh  # noqa: E402
 from .node import Node  # noqa: E402
 from .load import load  # noqa: E402
 from .viewer import Viewer  # noqa: E402
+from .textureCubeMap import TextureCubeMap, TexturedCubeMap  # noqa: E402

@@ -5,7 +5,7 @@ from typing import Callable
 import numpy as np
 from perlin_noise import PerlinNoise
 
-from sources.objects import Terrain, Tree
+from sources.objects import Terrain, Tree, SkyBox
 from sources.wrapper import Shader, Viewer
 from sources.utils import empty_grid, laplacian_of_gaussian, conditional_random_points
 
@@ -33,6 +33,9 @@ def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer(distance=150)
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
+    CubeMapShader = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
+
+    viewer.add(SkyBox(CubeMapShader))
 
     noise = PerlinNoise(octaves=15, seed=1)
     laplacian_sigma = 5
