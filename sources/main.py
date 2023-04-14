@@ -5,7 +5,7 @@ from typing import Callable
 import numpy as np
 from perlin_noise import PerlinNoise
 
-from sources.objects import Terrain, Tree
+from sources.objects import Terrain, Tree, PointAnimation
 from sources.wrapper import Shader, Viewer
 from sources.utils import empty_grid, laplacian_of_gaussian, conditional_random_points
 
@@ -56,6 +56,8 @@ def main():
     terrain = Terrain(shader, xpix, zpix, generator=generator)
     viewer.add(terrain)
 
+    viewer.add(PointAnimation(shader))
+
     def inside_volcano(x: int, z: int) -> bool:
         return sqrt((x - xav) ** 2 + (z - zav) ** 2) > laplacian_sigma * sigma_radius
 
@@ -65,6 +67,7 @@ def main():
 
     # start rendering loop
     viewer.run()
+
 
 
 if __name__ == '__main__':
