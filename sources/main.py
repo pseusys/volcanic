@@ -33,6 +33,7 @@ def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer(distance=150)
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
+    shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
 
     noise = PerlinNoise(octaves=15, seed=1)
     laplacian_sigma = 5
@@ -45,6 +46,10 @@ def main():
     tree_margin = 5
     tree_height = 3
 
+    if sqrt((xav - tree_margin) ** 2 + (zav - tree_margin) ** 2) <= laplacian_sigma * sigma_radius and tree_number > 0:
+        print(f"Configuration incorrect! No place for {tree_number} trees!")
+        exit(1)
+
     generator = terrain_generator(
         lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma),
         lambda x, z: noise([x, z]),
@@ -53,7 +58,7 @@ def main():
         50.,
         1.
     )
-    terrain = Terrain(shader, xpix, zpix, generator=generator)
+    terrain = Terrain(shader_map, xpix, zpix, generator=generator)
     viewer.add(terrain)
 
     def inside_volcano(x: int, z: int) -> bool:
