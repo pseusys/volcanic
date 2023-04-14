@@ -19,7 +19,7 @@ def main(configs: Dict[str, Dict[str, int]]):
     xpix = configs["general"]["size_x"]
     zpix = configs["general"]["size_z"]
 
-    noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"], seed=1)
+    noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
     sigma_radius = configs["terrain"]["sigma_radius"]
 
