@@ -14,7 +14,6 @@ uniform mat4 projection;
 out vec3 w_position, w_normal;   // in world coordinates
 
 void main() {
-    // TODO: compute the vertex position and normal in world or view coordinates
     w_normal = (model * vec4(normal, 0)).xyz;
     w_position = (model * vec4(position, 0)).xyz;
 
