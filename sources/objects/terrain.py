@@ -1,5 +1,4 @@
-from math import sqrt
-from typing import Callable, Optional, List, Tuple
+from typing import Callable, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -102,11 +101,3 @@ class Terrain(Mesh):
 
     def get_height(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._position[x * self._x + z]
-
-    def get_volcano_edges(self) -> List[npt.NDArray[np.float64]]:
-        edges = list()
-        for idx, pos in enumerate(self._position):
-            if not (pos[0] != 0 and pos[2] != 0) and sqrt(pos[0] ** 2 + pos[2] ** 2) < self._radius:
-                if self._normals[idx][1] > abs(self._normals[idx][0]) + abs(self._normals[idx][2]):
-                    edges += [pos]
-        return edges
