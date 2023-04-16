@@ -11,8 +11,7 @@ in vec3 w_k_a, w_k_d, w_k_s;
 in float w_s;
 
 // global matrix variables
-uniform mat4 model;
-uniform mat4 view;
+uniform mat4 model, view;
 
 // world camera position
 uniform vec3 w_camera_position;

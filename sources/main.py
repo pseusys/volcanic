@@ -14,7 +14,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
-    shader_water = Shader("shaders/liquid.vert", "shaders/liquid.frag")
+    shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
 
     limit = configs["general"]["size_limit"]
     average = limit / 2
@@ -32,7 +32,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         exit(1)
 
     generator = terrain_generator(
-        lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z, weight=configs["terrain"]["carrier_weight"]),
+        lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z),
         lambda x, z: noise([x, z]),
         limit,
         limit,
@@ -43,7 +43,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer.add(terrain)
 
     # TODO: correct radius, correct height, triangles maybe?
-    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, 10, center_shift=-1.)
+    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, 10, center_shift=-1., glowing=True, shininess=32.)
     viewer.add(lava)
 
     # TODO: correct height

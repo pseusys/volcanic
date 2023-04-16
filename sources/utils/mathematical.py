@@ -18,6 +18,6 @@ def sign(x: float):
     return 1 if x > 0 else -1
 
 
-def square_extended(x: float, z: float, shore_size: int = 40., weight: int = 50.) -> float:
+def square_extended(x: float, z: float, shore_size: int = 40., dive: int = 50.) -> float:
     dist = sqrt(x ** 2 + z ** 2)
-    return sqrt(max(dist - shore_size, 0)) / weight
+    return sqrt(max(dist - shore_size, 0)) / dive

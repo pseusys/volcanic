@@ -11,8 +11,7 @@ uniform vec3 k_a, k_d, k_s;
 uniform float s;
 
 // global matrix variables
-uniform mat4 model;
-uniform mat4 view;
+uniform mat4 model, view;
 
 // world camera position
 uniform vec3 w_camera_position;
