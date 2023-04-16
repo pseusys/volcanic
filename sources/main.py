@@ -6,7 +6,7 @@ from perlin_noise import PerlinNoise
 
 from sources.config import read_config
 from sources.custom import terrain_generator
-from sources.objects import Terrain, Tree
+from sources.objects import Terrain, Tree, Liquid
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points
 
@@ -15,6 +15,7 @@ def main(configs: Dict[str, Dict[str, int]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
+    shader_water = Shader("shaders/liquid.vert", "shaders/liquid.frag")
 
     xpix = configs["general"]["size_x"]
     zpix = configs["general"]["size_z"]
@@ -43,6 +44,9 @@ def main(configs: Dict[str, Dict[str, int]]):
     )
     terrain = Terrain(shader_map, xpix, zpix, generator=generator)
     viewer.add(terrain)
+
+    liquid = Liquid(shader_water, "assets/lava.png")
+    viewer.add(liquid)
 
     def inside_volcano(x: int, z: int) -> bool:
         return sqrt((x - xav) ** 2 + (z - zav) ** 2) > laplacian_sigma * sigma_radius

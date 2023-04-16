@@ -1,8 +1,7 @@
 #version 330 core
 
-// fragment position and normal of the fragment, in WORLD coordinates
-// (you can also compute in VIEW coordinates, your choice! rename variables)
-in vec3 w_position, w_normal;   // in world coodinates
+// fragment position and normal of the fragment
+in vec3 w_position, w_normal;
 
 // light dir, in world coordinates
 uniform vec3 light_dir;
