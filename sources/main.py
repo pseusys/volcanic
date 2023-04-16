@@ -23,16 +23,18 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
     sigma_radius = configs["terrain"]["sigma_radius"]
 
+    island_radius = 40
+
     tree_number = configs["trees"]["tree_number"]
     tree_margin = configs["trees"]["tree_margin"]
     tree_height = configs["trees"]["tree_height"]
 
-    if sqrt((average - tree_margin) ** 2) * 2 <= laplacian_sigma * sigma_radius and tree_number > 0:
+    if average - min(tree_margin, average - island_radius) <= laplacian_sigma * sigma_radius and tree_number > 0:
         print(f"Configuration incorrect! No place for {tree_number} trees!")
         exit(1)
 
     generator = terrain_generator(
-        lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z),
+        lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z, shore_size=island_radius),
         lambda x, z: noise([x, z]),
         limit,
         limit,
@@ -47,13 +49,13 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer.add(lava)
 
     # TODO: correct height
-    water = Liquid(shader_water, "assets/water.jpg", round(average), -1, speed=5., transparency=.5, distortion=15.)
+    water = Liquid(shader_water, "assets/water.jpg", round(average), -1, amplitude=.02, speed=5., transparency=.5, distortion=25.)
     viewer.add(water)
 
-    def inside_volcano(x: int, z: int) -> bool:
-        return sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
+    def in_island(x: int, z: int) -> bool:
+        return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
-    trees = conditional_random_points(tree_number, inside_volcano, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
+    trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
         viewer.add(Tree(shader, tx, tz, terrain, tree_height))
 
