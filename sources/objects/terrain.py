@@ -8,18 +8,18 @@ from ..wrapper import Shader, Mesh
 from ..utils import triangle_normal, empty_grid, lerp
 
 
+_EDGE_MAP = np.array([.0, .1, .2, .5, .9, 1.1], dtype=np.float64)
+_COLOR_MAP = np.array([(.8, .8, .0), (1., 1., .4), (.0, .8, .0), (.2, .2, .0), (.6, .6, .4), (.8, .8, .8)], dtype=np.float64)
+_SHINY_MAP = np.array([(64.,), (64.,), (32.,), (64.,), (8.,), (1.,)], dtype=np.float64)
+
+
 def _flat_gen(_: int, __: int) -> float:
     return 0.0
 
 
 class Terrain(Mesh):
     """ Class for drawing a terrain object """
-
-    _EDGE_MAP = np.array([.0, .1, .2, .5, .9, 1.1], dtype=np.float64)
-    _COLOR_MAP = np.array([(.8, .8, .0), (1., 1., .4), (.0, .8, .0), (.2, .2, .0), (.6, .6, .4), (.8, .8, .8)], dtype=np.float64)
-    _SHINY_MAP = np.array([(64.,), (64.,), (32.,), (64.,), (8.,), (1.,)], dtype=np.float64)
-
-    def __init__(self, shader: Shader, size_x: int, size_z: int, radius: int, generator: Optional[Callable[[int, int], float]] = None):
+    def __init__(self, shader: Shader, size_x: int, size_z: int, radius: int, color_map: npt.NDArray[np.float64] = _COLOR_MAP, shiny_map: npt.NDArray[np.float64] = _SHINY_MAP, generator: Optional[Callable[[int, int], float]] = None):
         if size_x <= 1 or size_z <= 1:
             raise Exception(f"Both terrain length ({size_x}) and width ({size_z}) should be greater than one!")
 
@@ -61,7 +61,7 @@ class Terrain(Mesh):
         k_d = empty_grid(x=size_x, z=size_z)
         s = empty_grid(x=size_x, z=size_z)
         for idx in range(len(self._position)):
-            k_d[idx], s[idx] = self._get_edge_index_fraction(self._position[idx][1])
+            k_d[idx], s[idx] = self._get_edge_index_fraction(self._position[idx][1], color_map, shiny_map)
 
         k_a = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (0, 0, 0)), dtype=np.float64)
         k_s = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (1, 1, 1)), dtype=np.float64)
@@ -91,12 +91,12 @@ class Terrain(Mesh):
             self._normals[vertex] += [even_normal]
         return index
 
-    def _get_edge_index_fraction(self, height: float) -> Tuple[npt.NDArray[np.float64], float]:
+    def _get_edge_index_fraction(self, height: float, color_map: npt.NDArray[np.float64], shiny_map: npt.NDArray[np.float64]) -> Tuple[npt.NDArray[np.float64], float]:
         height = (height - self._minimal_height) / self._height_difference
-        index = bisect_left(self._EDGE_MAP, height)
-        fraction = (height - self._EDGE_MAP[index - 1]) / (self._EDGE_MAP[index] - self._EDGE_MAP[index - 1])
-        color = lerp(self._COLOR_MAP[index - 1], self._COLOR_MAP[index], fraction)
-        shininess = lerp(self._SHINY_MAP[index - 1], self._SHINY_MAP[index], fraction)
+        index = bisect_left(_EDGE_MAP, height)
+        fraction = (height - _EDGE_MAP[index - 1]) / (_EDGE_MAP[index] - _EDGE_MAP[index - 1])
+        color = lerp(color_map[index - 1], color_map[index], fraction)
+        shininess = lerp(shiny_map[index - 1], shiny_map[index], fraction)
         return color, shininess
 
     def get_normal(self, x: int, z: int) -> npt.NDArray[np.float64]:

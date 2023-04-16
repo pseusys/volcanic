@@ -1,11 +1,12 @@
-from math import sqrt
+from math import sqrt, floor
 from typing import Dict, Union
 
 from perlin_noise import PerlinNoise
 
 from sources.config import read_config
 from sources.custom import terrain_generator
-from sources.objects import Terrain, Tree, Liquid
+from sources.heat import Heat
+from sources.objects import Terrain, Tree, Liquid, Ice
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
 
@@ -17,6 +18,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
 
     limit = configs["general"]["size_limit"]
+    heat = Heat(configs["general"]["heat"])
     average = limit / 2
 
     noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
@@ -41,7 +43,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         configs["terrain"]["carrier_weight"],
         configs["terrain"]["perlin_weight"]
     )
-    terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, generator=generator)
+    terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, generator=generator, color_map=heat.terrain_colors, shiny_map=heat.terrain_shininess)
     viewer.add(terrain)
 
     # TODO: correct radius, correct height, triangles maybe?
@@ -52,12 +54,21 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     water = Liquid(shader_water, "assets/water.jpg", round(average), -1, amplitude=.02, speed=5., transparency=.5, distortion=25.)
     viewer.add(water)
 
+    # TODO: ice margin, positioning
+    def in_sea(x: int, z: int) -> bool:
+        return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + tree_margin
+
+    if heat.generate_ice:
+        icebergs = conditional_random_points(25, in_sea, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
+        for tx, tz in icebergs:
+            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), -1))
+
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader, tx, tz, terrain, tree_height))
+        viewer.add(Tree(shader, tx, tz, terrain, tree_height, color_map=heat.tree_colors))
 
     viewer.run()
 
