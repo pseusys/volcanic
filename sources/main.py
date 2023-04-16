@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 from math import sqrt
-from typing import Dict
+from typing import Dict, Union
 
 from perlin_noise import PerlinNoise
 
@@ -11,7 +10,7 @@ from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points
 
 
-def main(configs: Dict[str, Dict[str, int]]):
+def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
@@ -42,10 +41,10 @@ def main(configs: Dict[str, Dict[str, int]]):
         configs["terrain"]["carrier_weight"],
         configs["terrain"]["perlin_weight"]
     )
-    terrain = Terrain(shader_map, xpix, zpix, generator=generator)
+    terrain = Terrain(shader_map, xpix, zpix, laplacian_sigma * sigma_radius, generator=generator)
     viewer.add(terrain)
 
-    liquid = Liquid(shader_water, "assets/lava.png")
+    liquid = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius, 10, terrain)
     viewer.add(liquid)
 
     def inside_volcano(x: int, z: int) -> bool:

@@ -1,6 +1,8 @@
-from typing import Tuple, Callable, Optional
+from math import sqrt
+from typing import Callable, Optional, List, Tuple
 
 import numpy as np
+import numpy.typing as npt
 
 from ..wrapper import Shader, Mesh
 from ..utils import triangle_normal, empty_grid
@@ -19,23 +21,21 @@ class Terrain(Mesh):
     _UPPER_COLOR = (0.999, 0.999, 0.666)
     _FLUCTUATIONS = 0.001
 
-    def __init__(self, shader: Shader, size_x: int, size_z: int, center: Tuple[int, int, int] = (0, 0, 0), generator: Optional[Callable[[int, int], float]] = None):
+    def __init__(self, shader: Shader, size_x: int, size_z: int, radius: int, generator: Optional[Callable[[int, int], float]] = None):
         if size_x <= 1 or size_z <= 1:
             raise Exception(f"Both terrain length ({size_x}) and width ({size_z}) should be greater than one!")
 
         self._x = size_x
         self._z = size_z
-
+        self._radius = radius
         generator = _flat_gen if generator is None else generator
-        start_x = center[0] - size_x // 2
-        start_z = center[2] - size_z // 2
 
         # Calculate vertex positions:
 
         self._position = empty_grid(x=size_x, z=size_z)
         for x in range(size_x):
             for z in range(size_z):
-                self._position[x * size_x + z] = (start_x + x, generator(x, z), start_z + z)
+                self._position[x * size_x + z] = (-size_x // 2 + x, generator(x, z), -size_z // 2 + z)
         self._position = np.array(self._position, dtype=np.float64)
 
         # Calculate triangle indexes together with normals:
@@ -88,17 +88,25 @@ class Terrain(Mesh):
                 k_d[idx] = np.array(self._MIDDLE_COLOR, dtype=np.float64) + upper_diff * height
                 s[idx] = np.array((64.,), dtype=np.float64) * (1 - height)
 
-        k_a = empty_grid(x=size_x, z=size_z, init=lambda: (0, 0, 0))
-        k_s = empty_grid(x=size_x, z=size_z, init=lambda: (1, 1, 1))
+        k_a = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (0, 0, 0)), dtype=np.float64)
+        k_s = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (1, 1, 1)), dtype=np.float64)
 
         # Set variables
 
-        colors = dict(k_a=np.array(k_a, dtype=np.float64), k_d=np.array(k_d, dtype=np.float64), k_s=np.array(k_s, dtype=np.float64), s=np.array(s, dtype=np.float64))
+        colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64))
         attributes = dict(position=self._position, normal=self._normals, **colors)
         super().__init__(shader, index=index, attributes=attributes)
 
-    def get_normal(self, x: int, z: int):
+    def get_normal(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._normals[x * self._x + z]
 
-    def get_height(self, x: int, z: int):
+    def get_height(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._position[x * self._x + z]
+
+    def get_volcano_edges(self) -> List[npt.NDArray[np.float64]]:
+        edges = list()
+        for idx, pos in enumerate(self._position):
+            if not (pos[0] != 0 and pos[2] != 0) and sqrt(pos[0] ** 2 + pos[2] ** 2) < self._radius:
+                if self._normals[idx][1] > abs(self._normals[idx][0]) + abs(self._normals[idx][2]):
+                    edges += [pos]
+        return edges
