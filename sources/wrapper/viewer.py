@@ -31,11 +31,11 @@ class Viewer(Node):
 
         # initialize trackball
         self.trackball = Trackball(distance=distance)
-        # self.mouse = (0, 0)
-
+        self.mouse = (0, 0)
+        self.new = (0,0)
         # register event handlers
         glfw.set_key_callback(self.win, self.on_key)
-        # glfw.set_cursor_pos_callback(self.win, self.on_mouse_move)
+        glfw.set_cursor_pos_callback(self.win, self.on_mouse_move)
         # glfw.set_scroll_callback(self.win, self.on_scroll)
         glfw.set_window_size_callback(self.win, self.on_size)
 
@@ -85,12 +85,17 @@ class Viewer(Node):
 
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
-        view = np.linalg.inv(self.trackball.view_matrix())[:, 3]
-        old = (view[0], view[1],view[2])
-        print(old)
+        # view = np.linalg.inv(self.trackball.view_matrix())[:, 3]
+        # old = (view[0], view[1],view[2])
+        # print(old)
 
-        move = (old[0] , old[1]-0.25, old[2])
-        print(move)
+        # move = (old[0] , old[1]-0.25, old[2])
+
+        
+        # print(move)
+        old = self.new
+        self.new = (old[0], old[1]-2)
+
         if action == glfw.PRESS or action == glfw.REPEAT:
             if key == glfw.KEY_ESCAPE or key == glfw.KEY_Q:
                 glfw.set_window_should_close(self.win, True)
@@ -99,7 +104,8 @@ class Viewer(Node):
                 self.trackball.zoom(1, glfw.get_window_size(_win)[1])
             if key == glfw.KEY_S:
                 self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
-            # if key == glfw.KEY_A:
+            if key == glfw.KEY_A:
+                self.trackball.pan(old, self.new)
                 # self.trackball.drag(old, move, glfw.get_window_size(_win) )
                 # self.trackball._rotate(old, move)
             # if key == glfw.KEY_D:
@@ -111,14 +117,14 @@ class Viewer(Node):
             # call Node.key_handler which calls key_handlers for all drawables
             self.key_handler(key)
 
-    # def on_mouse_move(self, win, xpos, ypos):
-    #     """ Rotate on left-click & drag, pan on right-click & drag """
-    #     old = self.mouse
-    #     self.mouse = (xpos, glfw.get_window_size(win)[1] - ypos)
-    #     if glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_LEFT):
-    #         self.trackball.drag(old, self.mouse, glfw.get_window_size(win))
-    #     if glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_RIGHT):
-    #         self.trackball.pan(old, self.mouse)
+    def on_mouse_move(self, win, xpos, ypos):
+        """ Rotate on left-click & drag, pan on right-click & drag """
+        old = self.mouse
+        self.mouse = (xpos, glfw.get_window_size(win)[1] - ypos)
+        # if glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_LEFT):
+        #     self.trackball.drag(old, self.mouse, glfw.get_window_size(win))
+        # if glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_RIGHT):
+            # self.trackball.pan(old, self.mouse)
 
     # def on_scroll(self, win, _deltax, deltay):
     #     """ Scroll controls the camera distance to trackball center """
