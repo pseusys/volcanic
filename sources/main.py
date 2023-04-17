@@ -7,6 +7,7 @@ from sources.config import read_config
 from sources.custom import terrain_generator
 from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice
+from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
 
@@ -35,6 +36,9 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         print(f"Configuration incorrect! No place for {tree_number} trees!")
         exit(1)
 
+    chrono = Chronograph(heat_state=configs["general"]["heat"])
+    viewer.set_time(chrono)
+
     generator = terrain_generator(
         lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z, shore_size=island_radius),
         lambda x, z: noise([x, z]),
@@ -47,7 +51,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer.add(terrain)
 
     # TODO: correct radius, correct height, triangles maybe?
-    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, 10, center_shift=-1., glowing=True, shininess=32.)
+    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, 10, center_shift=-1., glowing=True, shininess=.6)
     viewer.add(lava)
 
     # TODO: correct height

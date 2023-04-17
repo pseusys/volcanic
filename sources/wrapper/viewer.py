@@ -8,6 +8,7 @@ import numpy as np                  # all matrix manipulations & OpenGL args
 from sources.utils import Trackball, identity
 
 from .node import Node
+from ..time import Chronograph
 
 
 class Viewer(Node):
@@ -54,6 +55,11 @@ class Viewer(Node):
         # cyclic iterator to easily toggle polygon rendering modes
         self.fill_modes = cycle([GL.GL_LINE, GL.GL_POINT, GL.GL_FILL])
 
+        self.chronograph = None
+
+    def set_time(self, chrono: Chronograph):
+        self.chronograph = chrono
+
     def run(self):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
@@ -61,8 +67,7 @@ class Viewer(Node):
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
             win_size = glfw.get_window_size(self.win)
-
-            light_dir = (sin(glfw.get_time() * pi), 1, cos(glfw.get_time() * pi))
+            self.chronograph.update(glfw.get_time())
 
             # draw our scene objects
             cam_pos = np.linalg.inv(self.trackball.view_matrix())[:, 3]
@@ -70,7 +75,7 @@ class Viewer(Node):
                       projection=self.trackball.projection_matrix(win_size),
                       model=identity(),
                       w_camera_position=cam_pos,
-                      light_dir=light_dir)
+                      light_pos=self.chronograph.sun_position)
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)

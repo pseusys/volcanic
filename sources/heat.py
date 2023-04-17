@@ -13,15 +13,15 @@ _TERRAIN_COLORS = [
 ]
 
 _TERRAIN_SHININESS = [
-    np.array([(64.,), (32.,), (8.,), (8.,), (4.,), (1.,)], dtype=np.float64),
-    np.array([(64.,), (64.,), (64.,), (64.,), (8.,), (1.,)], dtype=np.float64),
-    np.array([(64.,), (64.,), (64.,), (64.,), (32.,), (16.,)], dtype=np.float64),
+    np.array([(0.,), (0.,), (.1,), (.1,), (.4,), (.8,)], dtype=np.float64),
+    np.array([(0.,), (0.,), (0.,), (0.,), (.1,), (.4,)], dtype=np.float64),
+    np.array([(0.,), (0.,), (0.,), (0.,), (0.,), (0.,)], dtype=np.float64)
 ]
 
 _TREE_COLORS = [
     np.array((.0, .0, .4), dtype=np.float64),
     np.array((.4, .2, 0), dtype=np.float64),
-    np.array((.0, .4, 0), dtype=np.float64),
+    np.array((.0, .4, 0), dtype=np.float64)
 ]
 
 

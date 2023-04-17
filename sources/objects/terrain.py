@@ -10,7 +10,7 @@ from ..utils import triangle_normal, empty_grid, lerp
 
 _EDGE_MAP = np.array([.0, .1, .2, .5, .9, 1.1], dtype=np.float64)
 _COLOR_MAP = np.array([(.8, .8, .0), (1., 1., .4), (.0, .8, .0), (.2, .2, .0), (.6, .6, .4), (.8, .8, .8)], dtype=np.float64)
-_SHINY_MAP = np.array([(64.,), (64.,), (32.,), (64.,), (8.,), (1.,)], dtype=np.float64)
+_SHINY_MAP = np.array([(0.,), (0.,), (1.,), (0.,), (4.,), (32.,)], dtype=np.float64)
 
 
 def _flat_gen(_: int, __: int) -> float:

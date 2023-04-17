@@ -33,6 +33,6 @@ class Ice(Mesh):
         position = np.array(position, dtype=np.float64)
         normals = np.array(normals, dtype=np.float64)
 
-        uniforms = dict(k_a=(0, 0, 0), k_d=(.8, 1., 1.), k_s=(0, 0, 0), s=.2, a=.75)
+        uniforms = dict(k_a=(0, 0, 0), k_d=(.8, 1., 1.), k_s=(0, 0, 0), s=1., a=.75)
         attributes = dict(position=position, normal=normals)
         super().__init__(shader, index=index, attributes=attributes, **uniforms)

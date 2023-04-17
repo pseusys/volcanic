@@ -7,7 +7,7 @@ from ..wrapper.texture import Texture, Textured
 
 
 class Liquid(Textured):
-    def __init__(self, shader: Shader, tex_file: str, radius: int, height: int, amplitude=.01, center_shift=0, speed=4., distortion=6., transparency=1., glowing=False, shininess=1.):
+    def __init__(self, shader: Shader, tex_file: str, radius: int, height: int, amplitude=.01, center_shift=0, speed=4., distortion=6., transparency=1., glowing=False, shininess=.1):
         positions = [(-radius, height, -radius), (radius, height, -radius), (radius, height, radius), (-radius, height, radius)]
         normals = [(0, 1, 0) for _ in positions]
         resolution = np.array([radius, radius], dtype=np.uint32)

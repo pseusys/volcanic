@@ -20,6 +20,6 @@ class Tree(Mesh):
         position = np.array(position, dtype=np.float64)
         normals = direction + np.array(normals, dtype=np.float64)
 
-        uniforms = dict(k_a=(0, 0, 0), k_d=color_map, k_s=(0, 0, 0), s=16., a=1.)
+        uniforms = dict(k_a=(0, 0, 0), k_d=color_map, k_s=(0, 0, 0), s=0., a=1.)
         attributes = dict(position=position, normal=normals)
         super().__init__(shader, index=index, attributes=attributes, **uniforms)
