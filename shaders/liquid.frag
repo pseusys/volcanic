@@ -52,7 +52,7 @@ void main() {
 
     vec2 waving = (center_pos / center_len) * cos(center_len * distortion - time * speed) * amplitude;
     vec2 uv = w_position.xz / resolution.xy + waving;
-    vec3 col = texture2D(tex, uv).xyz;
+    vec3 col = texture(tex, uv).xyz;
 
     vec3 normal_normal = normalize(w_normal);
     vec3 normal_light = normalize(light_pos);
