@@ -19,14 +19,14 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
 
     limit = configs["general"]["size_limit"]
-    heat = Heat(configs["general"]["heat"])
+    heat_state = configs["general"]["heat"]
     average = limit / 2
 
     noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
     sigma_radius = configs["terrain"]["sigma_radius"]
 
-    island_radius = 40
+    island_radius = configs["terrain"]["island_radius"]
 
     tree_number = configs["trees"]["tree_number"]
     tree_margin = configs["trees"]["tree_margin"]
@@ -36,7 +36,15 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         print(f"Configuration incorrect! No place for {tree_number} trees!")
         exit(1)
 
-    chrono = Chronograph(heat_state=configs["general"]["heat"])
+    ice_number = configs["ice"]["ice_number"]
+    ice_margin = configs["ice"]["ice_margin"]
+
+    if average - ice_margin <= island_radius and ice_number > 0:
+        print(f"Configuration incorrect! No place for {ice_number} icebergs!")
+        exit(1)
+
+    heat = Heat(heat_state)
+    chrono = Chronograph(heat_state, **configs["time"])
     viewer.set_time(chrono)
 
     generator = terrain_generator(
@@ -47,25 +55,23 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         configs["terrain"]["carrier_weight"],
         configs["terrain"]["perlin_weight"]
     )
-    terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, generator=generator, color_map=heat.terrain_colors, shiny_map=heat.terrain_shininess)
+    terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, heat.terrain_colors, heat.terrain_shininess, generator)
     viewer.add(terrain)
 
-    # TODO: correct radius, correct height, triangles maybe?
-    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, 10, center_shift=-1., glowing=True, shininess=.6)
+    # TODO: correct radius, triangles maybe, rising lava?
+    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
     viewer.add(lava)
 
-    # TODO: correct height
-    water = Liquid(shader_water, "assets/water.jpg", round(average), -1, amplitude=.02, speed=5., transparency=.5, distortion=25.)
+    water = Liquid(shader_water, "assets/water.jpg", round(average), **configs["water"], glowing=False)
     viewer.add(water)
 
-    # TODO: ice margin, positioning
     def in_sea(x: int, z: int) -> bool:
-        return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + tree_margin
+        return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + ice_margin
 
     if heat.generate_ice:
-        icebergs = conditional_random_points(25, in_sea, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
+        icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
-            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), -1))
+            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), configs["water"]["height"]))
 
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius

@@ -9,9 +9,8 @@ class Chronograph:
     SEASON_LENGTH = 91
     YEAR_LENGTH = 364
 
-    def __init__(self, heat_state: float, sun_bias: float = 1., init_day: float = SEASON_LENGTH, day_length: float = 10, sun_direction: int = 1):
+    def __init__(self, heat_state: float, sun_bias: float = 1., init_day: float = SEASON_LENGTH, day_length: float = 10):
         self._day_length = day_length
-        self._sun_direction = sun_direction
         self._global_time = init_day
         self._winter_bias = (Heat.TEMPERATURES[-1] - heat_state) * sun_bias
 
