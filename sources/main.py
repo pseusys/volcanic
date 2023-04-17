@@ -59,10 +59,10 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer.add(terrain)
 
     # TODO: correct radius, triangles maybe, rising lava?
-    lava = Liquid(shader_water, "assets/lava.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
+    lava = Liquid(shader_water, "assets/lava_tex.png", "assets/lava_norm.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
     viewer.add(lava)
 
-    water = Liquid(shader_water, "assets/water.jpg", round(average), **configs["water"], glowing=False)
+    water = Liquid(shader_water, "assets/water_tex.jpg", "assets/water_norm.jpg", round(average), **configs["water"], glowing=False)
     viewer.add(water)
 
     def in_sea(x: int, z: int) -> bool:
