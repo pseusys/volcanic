@@ -23,7 +23,6 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
     average = limit / 2
-    viewer.add(SkyBox(average, CubeMapShader))
 
     noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
@@ -48,6 +47,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     heat = Heat(heat_state)
     chrono = Chronograph(heat_state, **configs["time"])
+    viewer.add(SkyBox(average, CubeMapShader, chrono))
     viewer.set_time(chrono)
 
     generator = terrain_generator(

@@ -5,7 +5,7 @@ from . import Shader, Mesh
 
 class TextureCubeMap:
     """ Helper class to create and automatically destroy textures """
-    def __init__(self, tex_type=GL.GL_TEXTURE_CUBE_MAP):
+    def __init__(self, name: str, type: str, tex_type=GL.GL_TEXTURE_CUBE_MAP):
         self.glid = GL.glGenTextures(1)
         self.type = tex_type
         tex_files = ['right', 'left', 'top', 'bottom','front', 'back']
@@ -13,8 +13,8 @@ class TextureCubeMap:
         try:
             for i, ftype in enumerate(tex_files):
                 # filename = f"assets/skyBox/sky_{ftype}.png"
-                filename = f"assets/Daylight Box_Pieces/Daylight Box_{ftype}.bmp"
-
+                filename = f"{name}_{ftype}.{type}"
+                print(filename)
                 # imports image as a numpy array in exactly right format
                 tex = Image.open(filename).convert('RGBA')
                 GL.glBindTexture(tex_type, self.glid)
