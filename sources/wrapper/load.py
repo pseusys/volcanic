@@ -4,7 +4,7 @@ import assimpcy                     # 3D resource loader
 import numpy as np                  # all matrix manipulations & OpenGL args
 
 from .texture import Texture, Textured
-from .textureCubeMap import TextureCubeMap, TexturedCubeMap
+from .texture_cube_map import TextureCubeMap, TexturedCubeMap
 from .animation import KeyFrameControlNode, Skinned
 from .node import Node
 from .mesh import Mesh
