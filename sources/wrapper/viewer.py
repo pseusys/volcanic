@@ -85,6 +85,12 @@ class Viewer(Node):
 
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
+        view = np.linalg.inv(self.trackball.view_matrix())[:, 3]
+        old = (view[0], view[1],view[2])
+        print(old)
+
+        move = (old[0] , old[1]-0.25, old[2])
+        print(move)
         if action == glfw.PRESS or action == glfw.REPEAT:
             if key == glfw.KEY_ESCAPE or key == glfw.KEY_Q:
                 glfw.set_window_should_close(self.win, True)
@@ -93,10 +99,11 @@ class Viewer(Node):
                 self.trackball.zoom(1, glfw.get_window_size(_win)[1])
             if key == glfw.KEY_S:
                 self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
-            if key == glfw.KEY_A:
-                self.trackball.drag(self.trackball.pos2d, self.mouse, glfw.get_window_size(_win))
-            if key == glfw.KEY_D:
-                self.trackball.drag(old, self.mouse, glfw.get_window_size(_win))
+            # if key == glfw.KEY_A:
+                # self.trackball.drag(old, move, glfw.get_window_size(_win) )
+                # self.trackball._rotate(old, move)
+            # if key == glfw.KEY_D:
+            #     self.trackball.drag(old, self.mouse, glfw.get_window_size(_win))
 
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
