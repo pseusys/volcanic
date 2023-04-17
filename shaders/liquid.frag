@@ -7,7 +7,7 @@ uniform float time;
 uniform vec2 resolution;
 
 // texture image
-uniform sampler2D tex;
+uniform sampler2D texture, normal;
 
 // waves insensitivity
 uniform float amplitude;
@@ -28,7 +28,7 @@ uniform float transparency;
 uniform bool glowing;
 
 // fragment position and normal of the fragment
-in vec3 w_position, w_normal;
+in vec3 w_position;
 
 // light dir, in world coordinates
 uniform vec3 light_pos;
@@ -52,9 +52,10 @@ void main() {
 
     vec2 waving = (center_pos / center_len) * cos(center_len * distortion - time * speed) * amplitude;
     vec2 uv = w_position.xz / resolution.xy + waving;
-    vec3 col = texture(tex, uv).xyz;
+    vec3 col = texture(texture, uv).xyz;
+    vec3 norm = texture(normal, uv).rbg;  
 
-    vec3 normal_normal = normalize(w_normal);
+    vec3 normal_normal = normalize(norm * 2.0 - 1.0);
     vec3 normal_light = normalize(light_pos);
     vec3 normal_view = normalize(w_camera_position - w_position);
 
