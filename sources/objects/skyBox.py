@@ -2,7 +2,7 @@ import numpy as np
 from ..wrapper import TexturedCubeMap, TextureCubeMap, Shader, Mesh
 
 class SkyBox(TexturedCubeMap):
-    def __init__(self, shader: Shader):
+    def __init__(self, size, shader: Shader):
         front = ((-1, 1, -1), 
                  (1, 1, -1), 
                  (1, 1, 1), 
@@ -41,7 +41,7 @@ class SkyBox(TexturedCubeMap):
                   (-1, -1, 1))
 
         vertices = front + back + left + right + top + bottom
-        scaled = 100 * np.array(vertices, np.float32)
+        scaled = size * np.array(vertices, np.float32)
         cube = Mesh(shader, attributes=dict(position=scaled))
         skyBox = TextureCubeMap()
 

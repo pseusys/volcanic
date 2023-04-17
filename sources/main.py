@@ -19,11 +19,11 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
 
-    viewer.add(SkyBox(CubeMapShader))
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
     average = limit / 2
+    viewer.add(SkyBox(average, CubeMapShader))
 
     noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
