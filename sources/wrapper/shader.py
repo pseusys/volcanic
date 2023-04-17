@@ -64,6 +64,7 @@ class Shader:
         GL.glDeleteProgram(self.glid)  # object dies => destroy GL object
 
     GL_SETTERS = {
+        GL.GL_BOOL:              GL.glUniform1uiv,
         GL.GL_UNSIGNED_INT:      GL.glUniform1uiv,
         GL.GL_UNSIGNED_INT_VEC2: GL.glUniform2uiv,
         GL.GL_UNSIGNED_INT_VEC3: GL.glUniform3uiv,

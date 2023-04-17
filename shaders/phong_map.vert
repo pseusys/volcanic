@@ -8,9 +8,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// position and normal for the fragment shader, in WORLD coordinates
-// (you can also compute in VIEW coordinates, your choice! rename variables)
-out vec3 w_position, w_normal;   // in world coordinates
+// position and normal for the fragment shader
+out vec3 w_position, w_normal;
 
 in vec3 k_a, k_d, k_s;
 in float s;
