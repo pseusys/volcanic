@@ -1,58 +1,48 @@
-import random
-from math import pi, sin, cos
+from random import uniform
+from math import sin, cos
 from typing import Tuple
 
-import glfw
 import numpy as np
 from OpenGL import GL
 
-from ..utils import lerp
+from ..utils import lerp, empty_grid
 from ..wrapper import Mesh, Shader
 
 
 class Smoke(Mesh):
-    _WIDESPREAD = .6
+    _WIDE_SPREAD = .6
+    _SPEED_STEP = .001
     
-    def __init__(self, shader: Shader, lower: int, higher: int, number: int = 1000, size: int = 2, thin: float = .5, thick: float = 1.):
+    def __init__(self, shader: Shader, lower: int, higher: int, number: int = 1000, size: int = 2, thin: float = .5, thick: float = 1., slow: float = 1., fast: float = 5., weak: float = 10., powerful: float = 100., flight: float = 25.):
         GL.glPointSize(size)
         self.lower = lower
         self.higher = higher
         self.number = number
-        self.flight = 25
+        self.flight = flight
 
-        self.coords = list()
-        self.speeds = list()
-        self.ascends = list()
-        self.heights = list()
-        self.rotors = list()
+        self.rotors = empty_grid(number, init=lambda: uniform(thin, thick))
+        self.speeds = empty_grid(number, init=lambda: uniform(slow, fast))
+        self.ascends = empty_grid(number, init=lambda: uniform(weak, powerful))
+        self.heights = empty_grid(number, init=lambda: 0)
 
-        for x in range(number): 
-            rotor = random.uniform(thin, thick)
-            height = 0
-            ascend = random.uniform(1, 10) * 10
-            speed = random.uniform(1, 5)
-            x, z = self._fog_position(height, rotor, ascend)
-            self.heights += [height]
-            self.speeds += [speed]
-            self.ascends += [ascend]
-            self.coords += [(x * self.flight, lerp(lower, higher, height), z * self.flight)]
-            self.rotors += [rotor]
+        self.coords = np.array(empty_grid(number, init=lambda: (0, 0, 0)), dtype=np.float32)
+        self._update_coords(0)
 
         uniforms = dict(k_a=(0, 0, 0), k_d=(1, 1, 1), k_s=(0, 0, 0), s=42.) 
-        attributes = dict(position=np.array(self.coords, dtype=np.float32))
-        super().__init__(shader, attributes=attributes, usage=GL.GL_STREAM_DRAW, **uniforms)
+        super().__init__(shader, attributes=dict(position=self.coords), usage=GL.GL_STREAM_DRAW, **uniforms)
 
     def draw(self, primitives=GL.GL_POINTS, attributes=None, **uniforms):
         attributes = dict() if attributes is None else attributes
-
-        for i in range(self.number):
-            self.heights[i] = (self.heights[i] + .001 * self.speeds[i]) % 1
-            nx, nz = self._fog_position(self.heights[i], self.rotors[i], self.ascends[i])
-            self.coords[i] = [(nx * self.flight, lerp(self.lower, self.higher, self.heights[i]), nz * self.flight)]
-
-        attributes = dict(**attributes, position=np.array(self.coords, dtype=np.float32))
+        self._update_coords(self._SPEED_STEP)
+        attributes = dict(**attributes, position=self.coords)
         super().draw(primitives, attributes=attributes, **uniforms)
 
+    def _update_coords(self, update_value: float):
+        for i in range(self.number):
+            self.heights[i] = (self.heights[i] + update_value * self.speeds[i]) % 1
+            x, z = self._fog_position(self.heights[i], self.rotors[i], self.ascends[i])
+            self.coords[i] = (x * self.flight, lerp(self.lower, self.higher, self.heights[i]), z * self.flight)
+
     def _fog_position(self, height: float, rotor: float, ascend: float) -> Tuple[float, float]:
-        multi = rotor * height ** self._WIDESPREAD
+        multi = rotor * height ** self._WIDE_SPREAD
         return multi * sin(height * ascend), multi * cos(height * ascend)
