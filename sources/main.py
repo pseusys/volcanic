@@ -15,7 +15,7 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
-    shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
+    shader_map = Shader("shaders/phong.vert", "shaders/phong_map.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 

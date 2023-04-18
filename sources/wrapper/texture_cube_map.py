@@ -11,9 +11,7 @@ class TextureCubeMap:
 
         try:
             for i, ftype in enumerate(tex_files):
-                # filename = f"assets/skyBox/sky_{ftype}.png"
                 filename = f"{name}_{ftype}.{type}"
-                print(filename)
                 # imports image as a numpy array in exactly right format
                 tex = Image.open(filename).convert('RGBA')
                 GL.glBindTexture(tex_type, self.glid)
