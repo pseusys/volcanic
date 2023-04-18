@@ -1,53 +1,58 @@
-#!/usr/bin/env python3
-import OpenGL.GL as GL                  # standard Python OpenGL wrapper
-import glfw                             # lean window system wrapper for OpenGL
-import numpy as np   
-from ..wrapper import Shader, Mesh                   # all matrix manipulations & OpenGL args
-from math import sin                    # sinusoidal function used to animate
 import random
-import math
+from math import pi, sin, cos
+from typing import Tuple
+
+import glfw
+import numpy as np
+from OpenGL import GL
+
+from ..utils import lerp
+from ..wrapper import Mesh, Shader
 
 
-# -------------- Simple demo of a point animation -----------------------------
 class PointAnimation(Mesh):
-    """ Simple animated particle set """
-    def __init__(self, shader):
+    _WIDESPREAD = .6
+    
+    def __init__(self, shader: Shader, lower: int, higher: int, number: int = 1000, size: int = 2, thin: float = .5, thick: float = 1.):
+        GL.glPointSize(size)
+        self.lower = lower
+        self.higher = higher
+        self.number = number
+        self.flight = 25
 
-        r = 5
-        n = 10000
-        # render points with wide size to be seen
-        GL.glPointSize(1)
+        self.coords = list()
+        self.speeds = list()
+        self.ascends = list()
+        self.heights = list()
+        self.rotors = list()
 
-        self.coords = []
+        for x in range(number): 
+            rotor = random.uniform(thin, thick)
+            height = 0
+            ascend = random.uniform(1, 10) * 10
+            speed = random.uniform(1, 5)
+            x, z = self._fog_position(height, rotor, ascend)
+            self.heights += [height]
+            self.speeds += [speed]
+            self.ascends += [ascend]
+            self.coords += [(x * self.flight, lerp(lower, higher, height), z * self.flight)]
+            self.rotors += [rotor]
 
-        for x in range(n): 
-            z = random.uniform(-1,1)
-            phi = random.uniform(0,0.999999)*2*np.pi
-            x = np.sqrt(1 - z**2)*np.cos(phi)
-            y = np.sqrt(1 - z**2)*np.sin(phi)
-            self.coords.append([2* r* x,r* y + 28,r* 2 * z])
-
-        # send as position attribute to GPU, set uniform variable global_color.
-        # GL_STREAM_DRAW tells OpenGL that attributes of this object
-        # will change on a per-frame basis (as opposed to GL_STATIC_DRAW)
-        uniforms = dict(k_a=(0, 0, 0), k_d=(1, 1, 1), k_s=(0, 0, 0), s=42.)
-      
-        super().__init__(shader, attributes=dict(position=self.coords),
-                         usage=GL.GL_STREAM_DRAW, global_color=(1, 1, 1), **uniforms)
+        uniforms = dict(k_a=(0, 0, 0), k_d=(1, 1, 1), k_s=(0, 0, 0), s=42.) 
+        attributes = dict(position=np.array(self.coords, dtype=np.float32))
+        super().__init__(shader, attributes=attributes, usage=GL.GL_STREAM_DRAW, **uniforms)
 
     def draw(self, primitives=GL.GL_POINTS, attributes=None, **uniforms):
+        attributes = dict() if attributes is None else attributes
 
-        # for index, x in enumerate(self.lifetime):
-        #     if x <= 0.0: 
-        #         x = random.uniform(1.0, 2.0)
-        #         self.coords[index] = (0, 0, 0)
+        for i in range(self.number):
+            self.heights[i] = (self.heights[i] + .001 * self.speeds[i]) % 1
+            nx, nz = self._fog_position(self.heights[i], self.rotors[i], self.ascends[i])
+            self.coords[i] = [(nx * self.flight, lerp(self.lower, self.higher, self.heights[i]), nz * self.flight)]
 
-		# moving parameters for the particles
-        dp = [[random.uniform(-10,10)* sin(0.3*(random.uniform(-5,5) + glfw.get_time())), 0.5* sin(0.3*(random.uniform(-5,5) + glfw.get_time())), random.uniform(-10,10)*sin(0.3*(random.uniform(-5,5)+ glfw.get_time()))] for i in range(len(self.coords))]
-       # delta_time = [(-0.1) for _ in range(len(self.coords))]
-        # update position buffer on CPU, send to GPU attribute to draw with it
-       # self.lifetime = np.array(self.lifetime, 'f') +  np.array(delta_time, 'f')
-        coords = np.array(self.coords, 'f') + np.array(dp, 'f')
+        attributes = dict(**attributes, position=np.array(self.coords, dtype=np.float32))
+        super().draw(primitives, attributes=attributes, **uniforms)
 
-        super().draw(primitives, attributes=dict(position=coords), **uniforms)
-
+    def _fog_position(self, height: float, rotor: float, ascend: float) -> Tuple[float, float]:
+        multi = rotor * height ** self._WIDESPREAD
+        return multi * sin(height * ascend), multi * cos(height * ascend)

@@ -60,9 +60,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, heat.terrain_colors, heat.terrain_shininess, generator)
     viewer.add(terrain)
 
-    viewer.add(PointAnimation(shader))
-
-    viewer.add(PointAnimation(shader))
+    # viewer.add(PointAnimation(shader, configs["lava"]["height"], average))
 
     # TODO: correct radius, triangles maybe, rising lava?
     lava = Liquid(shader_water, "assets/lava_tex.png", "assets/lava_norm.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
