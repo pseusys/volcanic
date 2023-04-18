@@ -1,4 +1,3 @@
-from math import sin, cos, pi
 from itertools import cycle         # allows easy circular choice list
 
 import glfw                         # lean window system wrapper for OpenGL
@@ -32,10 +31,9 @@ class Viewer(Node):
         # initialize trackball
         self.trackball = Trackball(distance=distance, pitch=25)
         self.mouse = (0, 0)
-        self.new = (0,0)
         # register event handlers
         glfw.set_key_callback(self.win, self.on_key)
-        # glfw.set_cursor_pos_callback(self.win, self.on_mouse_move)
+        # glfw.set_cursor_pos_callback(self.win, self.on_mouse_move) # TODO: implement?
         glfw.set_scroll_callback(self.win, self.on_scroll)
         glfw.set_window_size_callback(self.win, self.on_size)
 
