@@ -18,7 +18,6 @@ def _flat_gen(_: int, __: int) -> float:
 
 
 class Terrain(Mesh):
-    """ Class for drawing a terrain object """
     def __init__(self, shader: Shader, size_x: int, size_z: int, radius: int, color_map: npt.NDArray[np.float64] = _COLOR_MAP, shiny_map: npt.NDArray[np.float64] = _SHINY_MAP, generator: Optional[Callable[[int, int], float]] = None):
         if size_x <= 1 or size_z <= 1:
             raise Exception(f"Both terrain length ({size_x}) and width ({size_z}) should be greater than one!")
@@ -69,8 +68,8 @@ class Terrain(Mesh):
         # Set variables
 
         colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64))
-        attributes = dict(position=self._position, normal=self._normals)
-        super().__init__(shader, index=index, attributes=attributes, **colors)
+        attributes = dict(position=self._position, normal=self._normals, **colors)
+        super().__init__(shader, index=index, attributes=attributes)
 
     def _compute_index_and_normals(self, x, size_x, z) -> Tuple[float, float, float, float, float, float]:
         vci = x * size_x + z  # Vertex current index
