@@ -1,4 +1,4 @@
-from random import uniform
+from random import uniform, choice
 from math import sin, cos
 from typing import Tuple
 
@@ -20,7 +20,7 @@ class Smoke(Mesh):
         self.number = number
         self.flight = flight
 
-        self.rotors = empty_grid(number, init=lambda: uniform(thin, thick))
+        self.rotors = empty_grid(number, init=lambda: uniform(thin, thick) * choice([-1, 1]))
         self.speeds = empty_grid(number, init=lambda: uniform(slow, fast))
         self.ascends = empty_grid(number, init=lambda: uniform(weak, powerful))
         self.heights = empty_grid(number, init=lambda: 0)
