@@ -26,7 +26,7 @@ void main() {
 
     vec3 ambient = k_a;
     vec3 material = k_d * max(dot(normal_normal, normal_light), 0);
-    vec3 reflect = k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * s;
+    vec3 reflection = k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * s;
 
-    out_color = vec4(ambient + material + reflect, a);
+    out_color = vec4(ambient + material + reflection, a);
 }

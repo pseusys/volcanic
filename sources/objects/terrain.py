@@ -69,8 +69,8 @@ class Terrain(Mesh):
         # Set variables
 
         colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64))
-        attributes = dict(position=self._position, normal=self._normals, **colors)
-        super().__init__(shader, index=index, attributes=attributes)
+        attributes = dict(position=self._position, normal=self._normals)
+        super().__init__(shader, index=index, attributes=attributes, **colors)
 
     def _compute_index_and_normals(self, x, size_x, z) -> Tuple[float, float, float, float, float, float]:
         vci = x * size_x + z  # Vertex current index

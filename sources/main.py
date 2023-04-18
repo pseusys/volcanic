@@ -6,7 +6,7 @@ from perlin_noise import PerlinNoise
 from sources.config import read_config
 from sources.custom import terrain_generator
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
@@ -15,8 +15,9 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
-    shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
+    shader_map = Shader("shaders/phong.vert", "shaders/phong_map.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
+    shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
@@ -45,6 +46,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     heat = Heat(heat_state)
     chrono = Chronograph(heat_state, **configs["time"])
+    viewer.add(SkyBox(average, shader_cubemap, "assets/sky_box/day_sky/day_sky", "bmp", "assets/sky_box/night_sky/night_sky", "png", chrono))
     viewer.set_time(chrono)
 
     generator = terrain_generator(
