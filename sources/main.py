@@ -6,7 +6,7 @@ from perlin_noise import PerlinNoise
 from sources.config import read_config
 from sources.custom import terrain_generator
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, PointAnimation
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
@@ -60,7 +60,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, heat.terrain_colors, heat.terrain_shininess, generator)
     viewer.add(terrain)
 
-    # viewer.add(PointAnimation(shader, configs["lava"]["height"], average))
+    viewer.add(Smoke(shader, configs["lava"]["height"], average))
 
     # TODO: correct radius, triangles maybe, rising lava?
     lava = Liquid(shader_water, "assets/lava_tex.png", "assets/lava_norm.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)

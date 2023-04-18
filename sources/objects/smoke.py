@@ -10,7 +10,7 @@ from ..utils import lerp
 from ..wrapper import Mesh, Shader
 
 
-class PointAnimation(Mesh):
+class Smoke(Mesh):
     _WIDESPREAD = .6
     
     def __init__(self, shader: Shader, lower: int, higher: int, number: int = 1000, size: int = 2, thin: float = .5, thick: float = 1.):
