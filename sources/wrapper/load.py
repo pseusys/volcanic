@@ -4,7 +4,6 @@ import assimpcy                     # 3D resource loader
 import numpy as np                  # all matrix manipulations & OpenGL args
 
 from .texture import Texture, Textured
-from .texture_cube_map import TextureCubeMap, TexturedCubeMap
 from .animation import KeyFrameControlNode, Skinned
 from .node import Node
 from .mesh import Mesh
@@ -124,7 +123,6 @@ def load(file, shader, tex_file=None, **params):
 
         if Textured is not None and 'diffuse_map' in mat:
             new_mesh = Textured(new_mesh, diffuse_map=mat['diffuse_map'])
-
         if Skinned and mesh.HasBones:
             # make bone lookup array & offset matrix, indexed by bone index (id)
             bone_nodes = [nodes[bone.mName] for bone in mesh.mBones]

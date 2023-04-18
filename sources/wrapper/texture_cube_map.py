@@ -1,7 +1,6 @@
 from PIL import Image
 import OpenGL.GL as GL
 
-from . import Shader, Mesh
 
 class TextureCubeMap:
     """ Helper class to create and automatically destroy textures """

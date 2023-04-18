@@ -15,10 +15,9 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader = Shader("shaders/phong.vert", "shaders/phong.frag")
-    CubeMapShader = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
-
+    shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
@@ -47,7 +46,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     heat = Heat(heat_state)
     chrono = Chronograph(heat_state, **configs["time"])
-    viewer.add(SkyBox(average, CubeMapShader, chrono))
+    viewer.add(SkyBox(average, shader_cubemap, "assets/sky_box/day_sky/day_sky", "bmp", "assets/sky_box/night_sky/night_sky", "png", chrono))
     viewer.set_time(chrono)
 
     generator = terrain_generator(
