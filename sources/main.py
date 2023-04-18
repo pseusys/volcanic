@@ -1,15 +1,13 @@
 from math import sqrt, floor
 from typing import Dict, Union
 
-from perlin_noise import PerlinNoise
-
 from sources.config import read_config
 from sources.custom import terrain_generator
 from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -23,7 +21,6 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     heat_state = configs["general"]["heat"]
     average = limit / 2
 
-    noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
     sigma_radius = configs["terrain"]["sigma_radius"]
 
@@ -51,7 +48,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     generator = terrain_generator(
         lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z, shore_size=island_radius),
-        lambda x, z: noise([x, z]),
+        lambda x, z: noise(x, z, configs["terrain"]["perlin_octaves"], configs["terrain"]["perlin_seed"]),
         limit,
         limit,
         configs["terrain"]["carrier_weight"],
