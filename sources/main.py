@@ -2,12 +2,11 @@ from math import sqrt, floor
 from typing import Dict, Union
 
 from sources.config import read_config
-from sources.custom import terrain_generator
 from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):

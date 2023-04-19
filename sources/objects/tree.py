@@ -7,7 +7,7 @@ from .terrain import Terrain
 from ..time import Chronograph
 from ..wrapper import Shader, Mesh, Textured
 from ..heat import Heat
-from ..utils import empty_grid, lerp, straight_angle_rotor
+from ..utils import lerp, straight_angle_rotor
 
 
 _COLOR_MAP = np.array((.666, .333, 0), dtype=np.float64)
@@ -57,8 +57,8 @@ class Tree(Mesh, Textured):
         normals = np.append([direction], normals, axis=0)
 
         self._a = np.array([(1,) for _ in range(len(position))], dtype=np.float32)
-        self._k_a = np.array(empty_grid(len(position), init=lambda: (0, 0, 0)), dtype=np.float32)
-        self._k_d = np.array(empty_grid(len(position), init=lambda: color_map), dtype=np.float32)
+        self._k_a = np.array([(0, 0, 0) for _ in range(len(position))], dtype=np.float32)
+        self._k_d = np.array([color_map for _ in range(len(position))], dtype=np.float32)
 
         attributes = dict(position=position, normal=normals, k_a=self._k_a, k_d=self._k_d, a=self._a)
         Mesh.__init__(self, shader, index=index, attributes=attributes)
