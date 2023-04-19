@@ -31,4 +31,4 @@ def cached(keys: Optional[List[str]] = None, maxsize: Optional[int] = None):
 
 @cached(maxsize=1)
 def vectorized(original_function: Callable):
-    return np.vectorize(original_function)
+    return np.vectorize(original_function, cache=True)
