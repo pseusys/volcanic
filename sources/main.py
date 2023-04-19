@@ -14,8 +14,9 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
-    shader = Shader("shaders/phong.vert", "shaders/phong.frag")
+    shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong.vert", "shaders/phong_map.frag")
+    shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 
@@ -60,7 +61,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, heat.terrain_colors, heat.terrain_shininess, generator)
     viewer.add(terrain)
 
-    viewer.add(Smoke(shader, configs["lava"]["height"], average, **configs["smoke"]))
+    viewer.add(Smoke(shader_smoke, configs["lava"]["height"], average, **configs["smoke"]))
 
     # TODO: correct radius, triangles maybe, rising lava?
     lava = Liquid(shader_water, "assets/lava_tex.png", "assets/lava_norm.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
@@ -75,14 +76,14 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     if heat.generate_ice:
         icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
-            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), configs["water"]["height"]))
+            viewer.add(Ice(shader_gen, floor(tx - average), floor(tz - average), configs["water"]["height"]))
 
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader, tx, tz, terrain, tree_height, color_map=heat.tree_colors))
+        viewer.add(Tree(shader_gen, tx, tz, terrain, tree_height, color_map=heat.tree_colors))
 
     viewer.run()
 

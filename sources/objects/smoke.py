@@ -28,7 +28,7 @@ class Smoke(Mesh):
         self.coords = np.array(empty_grid(number, init=lambda: (0, 0, 0)), dtype=np.float32)
         self._update_coords(0)
 
-        uniforms = dict(k_a=(0, 0, 0), k_d=(1, 1, 1), k_s=(0, 0, 0), s=42.) 
+        uniforms = dict(k_a=(0, 0, 0), k_d=(.4, .4, .4), a=.5) 
         super().__init__(shader, attributes=dict(position=self.coords), usage=GL.GL_STREAM_DRAW, **uniforms)
 
     def draw(self, primitives=GL.GL_POINTS, attributes=None, **uniforms):
