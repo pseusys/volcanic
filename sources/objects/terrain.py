@@ -64,10 +64,11 @@ class Terrain(Mesh):
 
         k_a = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (0, 0, 0)), dtype=np.float64)
         k_s = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (1, 1, 1)), dtype=np.float64)
+        a = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (1,)), dtype=np.float64)
 
         # Set variables
 
-        colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64))
+        colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64), a=a)
         attributes = dict(position=self._position, normal=self._normals, **colors)
         super().__init__(shader, index=index, attributes=attributes)
 

@@ -77,7 +77,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader, tx, tz, terrain, tree_height, color_map=heat.tree_colors))
+        viewer.add(Tree(shader_map, tx, tz, terrain, heat_state, chrono, tree_height, color_map=heat.tree_colors))
 
     viewer.run()
 
