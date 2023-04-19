@@ -68,14 +68,14 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     if heat.generate_ice:
         icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
-            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), configs["water"]["height"]))
+            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), **configs["water"]))
 
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader_map, tx, tz, terrain, heat_state, chrono, **configs["trees"], color_map=heat.tree_colors))
+        viewer.add(Tree(shader_map, tx, tz, terrain, chrono, **configs["trees"], heat_state=heat_state, color_map=heat.tree_colors))
 
     viewer.run()
 

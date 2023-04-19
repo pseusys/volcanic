@@ -4,7 +4,7 @@ from ..wrapper import Shader, Mesh
 
 
 class Ice(Mesh):
-    def __init__(self, shader: Shader, x: int, z: int, height: float):
+    def __init__(self, shader: Shader, x: int, z: int, height: float, **_):
         normals = [(-1, 1, 1), (-1, 1, -1), (1, 1, 1), (1, 1, -1), (-1, -1, 1), (-1, -1, -1), (1, -1, 1), (1, -1, -1)]
         position = [
             (x - 1, height + .25, z + 1),
