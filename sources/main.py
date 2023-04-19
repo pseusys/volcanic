@@ -26,16 +26,15 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     island_radius = configs["terrain"]["island_radius"]
 
-    tree_number = configs["trees"]["tree_number"]
-    tree_margin = configs["trees"]["tree_margin"]
-    tree_height = configs["trees"]["tree_height"]
+    tree_number = configs["trees"]["number"]
+    tree_margin = configs["trees"]["margin"]
 
     if average - min(tree_margin, average - island_radius) <= laplacian_sigma * sigma_radius and tree_number > 0:
         print(f"Configuration incorrect! No place for {tree_number} trees!")
         exit(1)
 
-    ice_number = configs["ice"]["ice_number"]
-    ice_margin = configs["ice"]["ice_margin"]
+    ice_number = configs["ice"]["number"]
+    ice_margin = configs["ice"]["margin"]
 
     if average - ice_margin <= island_radius and ice_number > 0:
         print(f"Configuration incorrect! No place for {ice_number} icebergs!")
@@ -77,7 +76,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader_map, tx, tz, terrain, heat_state, chrono, tree_height, color_map=heat.tree_colors))
+        viewer.add(Tree(shader_map, tx, tz, terrain, heat_state, chrono, **configs["trees"], color_map=heat.tree_colors))
 
     viewer.run()
 

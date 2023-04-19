@@ -102,5 +102,5 @@ class Terrain(Mesh):
     def get_normal(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._normals[x * self._x + z]
 
-    def get_height(self, x: int, z: int) -> npt.NDArray[np.float64]:
+    def get_position(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._position[x * self._x + z]

@@ -1,6 +1,7 @@
 from math import exp, pi, sqrt
 
 import numpy as np
+import numpy.typing as npt
 
 
 def triangle_normal(v1, v2, v3):
@@ -21,3 +22,11 @@ def sign(x: float):
 def square_extended(x: float, z: float, shore_size: int = 40., dive: int = 50.) -> float:
     dist = sqrt(x ** 2 + z ** 2)
     return sqrt(max(dist - shore_size, 0)) / dive
+
+
+def straight_angle_rotor(distance: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    x = np.random.randn(3)
+    x -= x.dot(distance) * distance
+    x /= np.linalg.norm(x)
+    y = np.cross(distance, x)
+    return [x, y, -x, -y]
