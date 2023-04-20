@@ -5,7 +5,7 @@ import numpy as np
 
 from sources.config import read_config
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal
@@ -13,8 +13,9 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
-    shader = Shader("shaders/phong.vert", "shaders/phong.frag")
+    shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
+    shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
     shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
@@ -58,6 +59,8 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     terrain = Terrain(shader_map, limit, limit, laplacian_sigma * sigma_radius, heat.terrain_colors, heat.terrain_shininess, generator)
     viewer.add(terrain)
 
+    viewer.add(Smoke(shader_smoke, configs["lava"]["height"], average, **configs["smoke"]))
+
     # TODO: correct radius, triangles maybe, rising lava?
     lava = Liquid(shader_water, "assets/lava_tex.png", "assets/lava_norm.png", laplacian_sigma * sigma_radius // 2, **configs["lava"], glowing=True)
     viewer.add(lava)
@@ -72,7 +75,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
             transform = translate(tx - average, configs["water"]["height"], tz - average)
-            iceberg = Ice(shader, transform)
+            iceberg = Ice(shader_gen, transform)
             viewer.add(iceberg)
 
     def in_island(x: int, z: int) -> bool:
@@ -86,6 +89,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
         viewer.add(tree)
 
     viewer.run()
+
 
 
 if __name__ == '__main__':
