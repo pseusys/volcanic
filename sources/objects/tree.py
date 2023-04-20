@@ -7,21 +7,17 @@ from .terrain import Terrain
 from ..time import Chronograph
 from ..wrapper import Shader, Mesh, Textured, Node
 from ..heat import Heat
-from ..utils import MeshedNode, lerp, straight_angle_rotor, translate, identity
+from ..utils import MeshedNode, lerp, straight_angle_rotor, translate, identity, normalize
 
 
 _COLOR_MAP = np.array((.666, .333, 0), dtype=np.float64)
 
 
-def _normalize(vector: npt.NDArray[np.float64]):
-    return vector / np.linalg.norm(vector)
-
-
 class EmptyTree(MeshedNode):
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+    def __init__(self, shader: Shader, base: npt.NDArray[np.float64], direction: npt.NDArray[np.float64], chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+        self.base = base
+        self.direction = normalize(direction)
         self.chrono = chrono
-        self.base = terrain.get_position(x, z)
-        self.direction = _normalize(terrain.get_normal(x, z))
 
         self.rotor = straight_angle_rotor(self.direction)
         self.normals = [self.direction] + self.rotor
@@ -33,7 +29,7 @@ class EmptyTree(MeshedNode):
         self._k_d = np.array([color_map for _ in range(len(self.position))], dtype=np.float32)
 
         attributes = dict(position=self.position, normal=self.normals, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        super().__init__(shader, tuple(), transform, attributes=attributes, index=self.index)
+        super().__init__(shader, tuple(), transform, attributes, self.index)
 
     @property
     def top(self) -> npt.NDArray[np.float64]:
@@ -46,27 +42,28 @@ class EmptyTree(MeshedNode):
 
 
 class ColdTree(EmptyTree):
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
-        super().__init__(shader, x, z, terrain, chrono, height, radius, color_map, transform)
+    def __init__(self, shader: Shader, base: npt.NDArray[np.float64], direction: npt.NDArray[np.float64], chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+        super().__init__(shader, base, direction, chrono, height, radius, color_map, transform)
 
         for rot in self.rotor:
+            pass
             # TODO: transpose (transpose tree and ice)
-            twig = EmptyTree(shader, 10, 10, terrain, chrono, height, radius, color_map)  # , transform=translate(rot + self.base + self.direction)
-            self.add(twig)
+            #twig = EmptyTree(shader, 10, 10, terrain, chrono, height, radius, color_map)  # , transform=translate(rot + self.base + self.direction)
+            #self.add(twig)
 
 
 class MediumTree(MeshedNode):
     _TREE_TOP_STEPS = 4  # TODO: implement with sphere
     _TREE_TOP_COLOR = np.array([(.0, 1., .0, 1.), (.0, .4, .0, 1.), (1., .4, .0, 1.), (.0, .0, .0, .0)], dtype=np.float64)
 
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
-        parent = EmptyTree(shader, x, z, terrain, chrono, height, radius, color_map)
+    def __init__(self, shader: Shader, base: npt.NDArray[np.float64], direction: npt.NDArray[np.float64], chrono: Chronograph, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+        parent = EmptyTree(shader, base, direction, chrono, height, radius, color_map)
         self._parent = parent
 
         circle_positions = [(parent.top + normal * circle) for normal in parent.rotor]
         upper_positions = [pos + parent.direction * circle for pos in circle_positions]
         lower_positions = [pos - parent.direction * circle for pos in circle_positions]
-        normals = [_normalize(pos - parent.base - parent.direction) for pos in upper_positions + lower_positions]
+        normals = [normalize(pos - parent.base - parent.direction) for pos in upper_positions + lower_positions]
         position = upper_positions + lower_positions
         index = [
             3, 0, 2, 2, 0, 1,
@@ -82,7 +79,7 @@ class MediumTree(MeshedNode):
         self._k_d = np.array([color_map for _ in range(len(position))], dtype=np.float32)
 
         attributes = dict(position=position, normal=normals, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        super().__init__(shader, tuple(), transform, attributes=attributes, index=index)
+        super().__init__(shader, tuple(), transform, attributes, index)
         # TODO: transpose
         self.add(parent)
 

@@ -1,4 +1,4 @@
-from math import sqrt, floor
+from math import sqrt
 from typing import Dict, Union
 
 from sources.config import read_config
@@ -6,7 +6,7 @@ from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -68,14 +68,19 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     if heat.generate_ice:
         icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
-            viewer.add(Ice(shader, floor(tx - average), floor(tz - average), **configs["water"]))
+            transform = translate(tx - average, configs["water"]["height"], tz - average)
+            iceberg = Ice(shader, transform)
+            viewer.add(iceberg)
 
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader_map, 0, 0, terrain, chrono, **configs["trees"], heat_state=heat_state, color_map=heat.tree_colors))
+        base = terrain.get_position(tx, tz)
+        direction = terrain.get_normal(tx, tz)
+        tree = Tree(shader_map, base, direction, chrono, heat_state=heat_state, color_map=heat.tree_colors, **configs["trees"])
+        viewer.add(tree)
 
     viewer.run()
 

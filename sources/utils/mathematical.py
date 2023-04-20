@@ -30,3 +30,7 @@ def straight_angle_rotor(distance: npt.NDArray[np.float64]) -> npt.NDArray[np.fl
     x /= np.linalg.norm(x)
     y = np.cross(distance, x)
     return [x, y, -x, -y]
+
+
+def normalize(vector: npt.NDArray[np.float64]):
+    return vector / np.linalg.norm(vector)
