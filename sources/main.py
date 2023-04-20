@@ -17,6 +17,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
+    shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
@@ -81,7 +82,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     for tx, tz in trees:
         terrain_normal = terrain.get_normal(tx, tz)
         transform = translate(terrain.get_position(tx, tz)) @ find_normal_rotation(normal_normal, terrain_normal)
-        tree = Tree(shader_map, chrono, heat_state=heat_state, color_map=heat.tree_colors, transform=transform, **configs["trees"])
+        tree = Tree(shader_map, heat_state=heat_state, leaf_shader=shader_textured, chrono=chrono, color_map=heat.tree_colors, transform=transform, **configs["trees"])
         viewer.add(tree)
 
     viewer.run()
