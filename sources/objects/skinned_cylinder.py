@@ -13,20 +13,20 @@ from sources.wrapper import KeyFrameControlNode, Skinned, Shader, Mesh, Viewer, 
 # -------------- Deformable Cylinder Mesh  ------------------------------------
 class SkinnedCylinder(KeyFrameControlNode):
     """ Deformable cylinder """
-    def __init__(self, shader, sections=11, quarters=20, transform=(0,0,0)):
+    def __init__(self, shader, sections=11, quarters=20, trans=(0,0,0), transform=identity()):
         forearm = KeyFrameControlNode(
             {0: (0, 0, 0)},
             {0: quaternion(), 2: quaternion_from_euler(90), 4: quaternion()},
-            {0: 1})
+            {0: 1}, transform=translate(10, 0, 0))
         
         hand = KeyFrameControlNode(
             {0: (sections/2 - 1, 0, 0)},    # translation to the forearm extremity
             {0: quaternion(), 2: quaternion_from_euler(45), 4: quaternion()},
-            {0: 1})   
+            {0: 1}, transform=translate(-10, 0, 0))   
             
         # this "arm" node and its transform serves as control node for bone 0
         # we give it the default identity keyframe transform, doesn't move
-        super().__init__({0: transform}, {0: quaternion()}, {0: 1})
+        super().__init__({0: trans}, {0: quaternion()}, {0: 1}, transform=transform)
         self.add(forearm)
         forearm.add(hand)
     
@@ -81,4 +81,3 @@ class SkinnedCylinder(KeyFrameControlNode):
                           bone_ids=bone_id, bone_weights=bone_weights)
         mesh = Mesh(shader, attributes=attributes, index=faces)
         self.add(Skinned(mesh, bone_nodes, bone_offsets))
-

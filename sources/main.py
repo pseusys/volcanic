@@ -7,7 +7,7 @@ from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, SkinnedCylinder
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, translate, scale
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, rotate
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -67,8 +67,8 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     # Birds
     shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
     wing_left = SkinnedCylinder(shader_wing)
-    wing_right = SkinnedCylinder(shader_wing)   
-    viewer.add(wing_left,wing_right)
+    wing_right = SkinnedCylinder(shader_wing, transform=rotate((0, 1, 0), 180))   
+    viewer.add(wing_left, wing_right)
 
     def in_sea(x: int, z: int) -> bool:
         return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + ice_margin

@@ -61,11 +61,11 @@ class KeyFrameControlNode(Node):
         super().__init__(transform=transform)
         self.keyframes = TransformKeyFrames(trans_keys, rot_keys, scale_keys)
 
-    def draw(self, primitives=GL.GL_TRIANGLES, **uniforms):
+    def draw(self, primitives=GL.GL_TRIANGLES, model=identity(), **uniforms):
         """ When redraw requested, interpolate our node transform from keys """
-        self.transform = self.keyframes.value(glfw.get_time())
-        print(self.transform)
-        super().draw(primitives=primitives, **uniforms)
+        self.world_transform = model @ self.transform @ self.keyframes.value(glfw.get_time())
+        for child in self.children:
+            child.draw(model=self.world_transform, **uniforms)
 
 
 class Skinned:
