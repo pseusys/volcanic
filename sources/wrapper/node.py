@@ -12,6 +12,10 @@ class Node:
         """ Add drawables to this node, simply updating children list """
         self.children.extend(drawables)
 
+    def remove(self, drawable):
+        """ Remove drawable from this node """
+        self.children.remove(drawable)
+
     def draw(self, model=identity(), **other_uniforms):
         """ Recursive draw, passing down updated model matrix. """
         self.world_transform = model @ self.transform

@@ -68,7 +68,7 @@ class MediumTree(MeshedNode):
         self.chrono = chrono
         self._parent = EmptyTree(shader, height, radius, color_map)
 
-        circle_positions = [(self._parent.top + normal * circle) for normal in self._parent.rotor]
+        circle_positions = [([0, height, 0] + normal * circle) for normal in self._parent.rotor]
         upper_positions = [pos + normal_normal * circle for pos in circle_positions]
         lower_positions = [pos - normal_normal * circle for pos in circle_positions]
         normals = [normalize(pos - normal_normal) for pos in upper_positions + lower_positions]
@@ -91,8 +91,8 @@ class MediumTree(MeshedNode):
 
     def draw(self, primitives=GL.GL_TRIANGLES, attributes=None, **uniforms):
         attributes = dict() if attributes is None else attributes
-        current_season = (self.chrono.season - .5) if self.chrono.season - .5 > 0 else (3 + self._parent.chrono.season - .5)
-        next_season = (self.chrono.season + .5) if self.chrono.season + .5 < 3 else (3 - self._parent.chrono.season - .5)
+        current_season = (self.chrono.season - .5) if self.chrono.season - .5 > 0 else (3 + self.chrono.season - .5)
+        next_season = (self.chrono.season + .5) if self.chrono.season + .5 < 3 else (3 - self.chrono.season - .5)
         fraction = current_season - floor(current_season)
 
         previous_color = self._TREE_TOP_COLOR[floor(current_season)][:-1]
@@ -114,7 +114,7 @@ class MediumTree(MeshedNode):
 class HotTree(Node):
     _LEAF_COUNT = 4
 
-    def __init__(self, shader: Shader, leaf_shader: Shader, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+    def __init__(self, shader: Shader, leaf_shader: Shader, leaf_texture: str, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
         Node.__init__(self, tuple(), transform)
         parent = EmptyTree(shader, height, radius, color_map)
         self.add(parent)
@@ -124,7 +124,7 @@ class HotTree(Node):
             rotation = rotate((0, 1, 0), i)
             retransform = translate(0, height, 0)
             rerotate = translate(0, 0, -length / 4)
-            leaf = Image(leaf_shader, "assets/leaf_tex.png", (0, 0, 0), (.3, .3, .3), .1, 1., length, length / 2, retransform @ rotation @ rerotate)
+            leaf = Image(leaf_shader, leaf_texture, (0, 0, 0), (.3, .3, .3), .1, 1., length, length / 2, retransform @ rotation @ rerotate)
             self.add(leaf)
 
 

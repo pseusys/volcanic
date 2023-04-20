@@ -5,7 +5,7 @@ import glfw                         # lean window system wrapper for OpenGL
 import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import numpy as np                  # all matrix manipulations & OpenGL args
 
-from sources.utils import Trackball, identity
+from sources.utils import Trackball, identity, rotate, scale, translate
 
 from .node import Node
 
@@ -55,12 +55,25 @@ class Viewer(Node):
         self.fill_modes = cycle([GL.GL_LINE, GL.GL_POINT, GL.GL_FILL])
 
         self.chronograph = None
+        self.splashscreen = None
 
     def set_time(self, chrono):
         self.chronograph = chrono
 
+    def set_splash(self, splash):
+        splash.transform = translate(1, 1, 0) @ scale(2, 2, 1) @ rotate((0, 0, 1), 270) @ rotate((1, 0, 0), 90)
+        self.splashscreen = splash
+        self.add(splash)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        self.draw(view=identity(), projection=identity(), model=identity(), w_camera_position=(0, 1, 0))
+        glfw.swap_buffers(self.win)
+        glfw.poll_events()
+
     def run(self):
         """ Main render loop for this OpenGL window """
+        if self.splashscreen is not None:
+            self.remove(self.splashscreen)
+
         while not glfw.window_should_close(self.win):
             # clear draw buffer and depth buffer (<-TP2)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)

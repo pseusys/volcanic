@@ -5,7 +5,7 @@ import numpy as np
 
 from sources.config import read_config
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke, Image
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
 from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal
@@ -13,12 +13,14 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
+    shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
+    viewer.set_splash(Image(shader_textured, "assets/splashscreen.jpg", (1, 1, 1), (0, 0, 0), 1., 1., 1., 1., True))
+
     shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
-    shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
@@ -85,7 +87,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     for tx, tz in trees:
         terrain_normal = terrain.get_normal(tx, tz)
         transform = translate(terrain.get_position(tx, tz)) @ find_normal_rotation(normal_normal, terrain_normal)
-        tree = Tree(shader_map, heat_state=heat_state, leaf_shader=shader_textured, chrono=chrono, color_map=heat.tree_colors, transform=transform, **configs["trees"])
+        tree = Tree(shader_map, heat_state=heat_state, leaf_shader=shader_textured, leaf_texture="assets/leaf_tex.png", chrono=chrono, color_map=heat.tree_colors, transform=transform, **configs["trees"])
         viewer.add(tree)
 
     viewer.run()
