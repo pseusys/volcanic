@@ -4,10 +4,10 @@ from typing import Dict, Union
 from sources.config import read_config
 from sources.custom import terrain_generator
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, SkinnedCylinder
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, translate, scale
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -63,6 +63,12 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     water = Liquid(shader_water, "assets/water_tex.jpg", "assets/water_norm.jpg", round(average), **configs["water"], glowing=False)
     viewer.add(water)
+
+    # Birds
+    shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
+    wing_left = SkinnedCylinder(shader_wing)
+    wing_right = SkinnedCylinder(shader_wing)   
+    viewer.add(wing_left,wing_right)
 
     def in_sea(x: int, z: int) -> bool:
         return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + ice_margin

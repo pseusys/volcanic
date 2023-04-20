@@ -3,3 +3,4 @@ from .terrain import Terrain
 from .sky_box import SkyBox
 from .liquid import Liquid
 from .ice import Ice
+from .skinned_cylinder import SkinnedCylinder
