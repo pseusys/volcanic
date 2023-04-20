@@ -168,7 +168,7 @@ class Node:
     """ Scene graph transform and parameter broadcast node """
     def __init__(self, children=(), transform=identity()):
         self.transform = transform
-        self.world_transform = identity()
+        self.world_transform = transform
         self.children = list(iter(children))
 
     def add(self, *drawables):
