@@ -66,8 +66,8 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     # Birds
     shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
-    wing_left = SkinnedCylinder(shader_wing)
-    wing_right = SkinnedCylinder(shader_wing, transform=rotate((0, 1, 0), 180))   
+    wing_left = SkinnedCylinder(shader_wing, transform=rotate((1, 0, 0), 180))
+    wing_right = SkinnedCylinder(shader_wing, transform=rotate((0, 1, 0), 180)@rotate((1, 0, 0), 180))   
     viewer.add(wing_left, wing_right)
 
     def in_sea(x: int, z: int) -> bool:
