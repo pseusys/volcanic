@@ -4,6 +4,8 @@ from PIL import Image               # load texture maps
 
 # -------------- OpenGL Texture Wrapper ---------------------------------------
 class Texture:
+    _CACHE = dict()
+
     """ Helper class to create and automatically destroy textures """
     def __init__(self, tex_file, wrap_mode=GL.GL_REPEAT,
                  mag_filter=GL.GL_LINEAR, min_filter=GL.GL_LINEAR_MIPMAP_LINEAR,
@@ -12,7 +14,7 @@ class Texture:
         self.type = tex_type
         try:
             # imports image as a numpy array in exactly right format
-            tex = Image.open(tex_file).convert('RGBA')
+            tex = self._CACHE.setdefault(tex_file, Image.open(tex_file).convert('RGBA'))
             GL.glBindTexture(tex_type, self.glid)
             GL.glTexImage2D(tex_type, 0, GL.GL_RGBA, tex.width, tex.height,
                             0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, tex.tobytes())
