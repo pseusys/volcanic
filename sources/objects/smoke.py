@@ -5,7 +5,7 @@ from typing import Tuple
 import numpy as np
 from OpenGL import GL
 
-from ..utils import lerp, empty_grid
+from ..utils import lerp
 from ..wrapper import Mesh, Shader
 
 
@@ -20,12 +20,12 @@ class Smoke(Mesh):
         self.number = number
         self.flight = flight
 
-        self.rotors = empty_grid(number, init=lambda: uniform(thin, thick) * choice([-1, 1]))
-        self.speeds = empty_grid(number, init=lambda: uniform(slow, fast))
-        self.ascends = empty_grid(number, init=lambda: uniform(weak, powerful))
-        self.heights = empty_grid(number, init=lambda: 0)
+        self.rotors = [uniform(thin, thick) * choice([-1, 1]) for _ in range(number)]
+        self.speeds = [uniform(slow, fast) for _ in range(number)]
+        self.ascends = [uniform(weak, powerful) for _ in range(number)]
+        self.heights = [0 for _ in range(number)]
 
-        self.coords = np.array(empty_grid(number, init=lambda: (0, 0, 0)), dtype=np.float32)
+        self.coords = np.array([(0, 0, 0) for _ in range(number)], dtype=np.float32)
         self._update_coords(0)
 
         uniforms = dict(k_a=(0, 0, 0), k_d=(.4, .4, .4), a=.5) 
