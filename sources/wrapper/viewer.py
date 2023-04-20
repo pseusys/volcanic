@@ -8,7 +8,6 @@ import numpy as np                  # all matrix manipulations & OpenGL args
 from sources.utils import Trackball, identity
 
 from .node import Node
-from ..time import Chronograph
 
 
 class Viewer(Node):
@@ -57,7 +56,7 @@ class Viewer(Node):
 
         self.chronograph = None
 
-    def set_time(self, chrono: Chronograph):
+    def set_time(self, chrono):
         self.chronograph = chrono
 
     def run(self):

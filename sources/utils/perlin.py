@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 import numpy as np
 import numpy.typing as npt
 
-from sources.utils.np_misc import cached, vectorized
+from .np_misc import cached, vectorized
 
 
 @cached()

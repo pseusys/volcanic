@@ -7,7 +7,7 @@ from .terrain import Terrain
 from ..time import Chronograph
 from ..wrapper import Shader, Mesh, Textured, Node
 from ..heat import Heat
-from ..utils import lerp, straight_angle_rotor, translate
+from ..utils import MeshedNode, lerp, straight_angle_rotor, translate, identity
 
 
 _COLOR_MAP = np.array((.666, .333, 0), dtype=np.float64)
@@ -17,8 +17,8 @@ def _normalize(vector: npt.NDArray[np.float64]):
     return vector / np.linalg.norm(vector)
 
 
-class EmptyTree(Mesh):
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, **_):
+class EmptyTree(MeshedNode):
+    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
         self.chrono = chrono
         self.base = terrain.get_position(x, z)
         self.direction = _normalize(terrain.get_normal(x, z))
@@ -33,7 +33,7 @@ class EmptyTree(Mesh):
         self._k_d = np.array([color_map for _ in range(len(self.position))], dtype=np.float32)
 
         attributes = dict(position=self.position, normal=self.normals, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        super().__init__(shader, index=self.index, attributes=attributes)
+        super().__init__(shader, tuple(), transform, attributes=attributes, index=self.index)
 
     @property
     def top(self) -> npt.NDArray[np.float64]:
@@ -42,37 +42,26 @@ class EmptyTree(Mesh):
     def draw(self, primitives=GL.GL_TRIANGLES, attributes=None, **uniforms):
         attributes = dict() if attributes is None else attributes
         attributes = dict(**attributes, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        Mesh.draw(self, primitives, attributes, **uniforms)
+        super().draw(primitives, attributes, **uniforms)
 
 
-class ColdTree(Node, EmptyTree):
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, **_):
-        EmptyTree.__init__(self, shader, x, z, terrain, chrono, height, radius, color_map)
-        Node.__init__(self)
+class ColdTree(EmptyTree):
+    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
+        super().__init__(shader, x, z, terrain, chrono, height, radius, color_map, transform)
 
         for rot in self.rotor:
             # TODO: transpose (transpose tree and ice)
-            container = Node(transform=translate(rot + self.base + self.direction))
-            twig = EmptyTree(shader, 0, 0, terrain, chrono, height, radius, color_map)
-            container.add(twig)
-            self.add(container)
-
-    def draw(self, primitives=GL.GL_TRIANGLES, attributes=None, **uniforms):
-        Mesh.draw(self, primitives, attributes, **uniforms)
-        Node.draw(self, **uniforms)
+            twig = EmptyTree(shader, 10, 10, terrain, chrono, height, radius, color_map)  # , transform=translate(rot + self.base + self.direction)
+            self.add(twig)
 
 
-class MediumTree(Node, Mesh):
+class MediumTree(MeshedNode):
     _TREE_TOP_STEPS = 4  # TODO: implement with sphere
     _TREE_TOP_COLOR = np.array([(.0, 1., .0, 1.), (.0, .4, .0, 1.), (1., .4, .0, 1.), (.0, .0, .0, .0)], dtype=np.float64)
 
-    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, **_):
+    def __init__(self, shader: Shader, x: int, z: int, terrain: Terrain, chrono: Chronograph, height: float, radius: float = 1., circle: float = 3., color_map: npt.NDArray[np.float64] = _COLOR_MAP, transform=identity(), **_):
         parent = EmptyTree(shader, x, z, terrain, chrono, height, radius, color_map)
         self._parent = parent
-
-        Node.__init__(self)
-        # TODO: transpose
-        self.add(parent)
 
         circle_positions = [(parent.top + normal * circle) for normal in parent.rotor]
         upper_positions = [pos + parent.direction * circle for pos in circle_positions]
@@ -93,7 +82,9 @@ class MediumTree(Node, Mesh):
         self._k_d = np.array([color_map for _ in range(len(position))], dtype=np.float32)
 
         attributes = dict(position=position, normal=normals, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        Mesh.__init__(self, shader, index=index, attributes=attributes)
+        super().__init__(shader, tuple(), transform, attributes=attributes, index=index)
+        # TODO: transpose
+        self.add(parent)
 
     def draw(self, primitives=GL.GL_TRIANGLES, attributes=None, **uniforms):
         attributes = dict() if attributes is None else attributes
@@ -114,8 +105,7 @@ class MediumTree(Node, Mesh):
             self._a[i] = (season_alpha,)
 
         attributes = dict(**attributes, k_a=self._k_a, k_d=self._k_d, a=self._a)
-        Mesh.draw(self, primitives, attributes, **uniforms)
-        Node.draw(self, **uniforms)
+        super().draw(primitives, attributes, **uniforms)
 
 
 
