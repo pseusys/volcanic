@@ -8,7 +8,7 @@ from ..wrapper import Shader, Textured, Node, Mesh, Texture
 
 
 class Image(Textured, Node):
-    def __init__(self, shader: Shader, texture: str, ambient: Tuple[float, float, float], shining: Tuple[float, float, float], shininess: float = .1, alpha: float = 1., xlen: float = 1, zlen: float = .05, transform=identity(), **_):
+    def __init__(self, shader: Shader, texture: str, ambient: Tuple[float, float, float], shining: Tuple[float, float, float], shininess: float = .1, alpha: float = 1., xlen: float = 1, zlen: float = .05, glowing: bool = False, transform=identity(), **_):
         Node.__init__(self, tuple(), transform)
         normals = [(0, 1, 0)] * 4
         position = [
@@ -28,7 +28,7 @@ class Image(Textured, Node):
             2, 1, 0
         ]
 
-        uniforms = dict(k_a=ambient, k_s=shining, s=shininess, a=alpha)
+        uniforms = dict(k_a=ambient, k_s=shining, s=shininess, a=alpha, glowing=glowing)
         attributes = dict(position=position, normal=normals, coordinate=coordinate)
         mesh = Mesh(shader, attributes=attributes, index=index, **uniforms)
         Textured.__init__(self, mesh, surface=Texture(texture))
