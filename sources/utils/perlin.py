@@ -12,8 +12,7 @@ from .np_misc import cached, vectorized
 @cached()
 def _create_sample(variation: npt.NDArray[np.uint64], seed: int) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.uint64]]:
     hashed_coords = abs(int(hash(variation.tobytes())))
-    sample = 2 * np.random.default_rng(seed * hashed_coords).random(variation.size) - 1
-    return sample
+    return 2 * np.random.default_rng(seed * hashed_coords).random(variation.size) - 1
 
 
 @vectorized
@@ -27,8 +26,7 @@ def _fade(given_value: np.float64) -> np.float64:
 def _get_noise_value(variation: npt.NDArray[np.uint64], seed: int, coordinates: npt.NDArray[np.uint64]):
     random_sample = _create_sample(variation, seed)
     weight = _fade(coordinates - variation).prod()
-    weighted_vector = weight * (random_sample @ (coordinates - variation))
-    return weighted_vector
+    return weight * (random_sample @ (coordinates - variation))
 
 
 @cached(keys=("x", "y"))
