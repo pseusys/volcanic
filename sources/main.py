@@ -1,12 +1,14 @@
 from math import sqrt
 from typing import Dict, Union
 
+import numpy as np
+
 from sources.config import read_config
 from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -77,9 +79,9 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        base = terrain.get_position(tx, tz)
-        direction = terrain.get_normal(tx, tz)
-        tree = Tree(shader_map, base, direction, chrono, heat_state=heat_state, color_map=heat.tree_colors, **configs["trees"])
+        terrain_normal = terrain.get_normal(tx, tz)
+        transform = translate(terrain.get_position(tx, tz)) @ find_normal_rotation(normal_normal, terrain_normal)
+        tree = Tree(shader_map, chrono, heat_state=heat_state, color_map=heat.tree_colors, transform=transform, **configs["trees"])
         viewer.add(tree)
 
     viewer.run()

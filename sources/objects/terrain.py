@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ..wrapper import Shader, Mesh
-from ..utils import triangle_normal, lerp
+from ..utils import triangle_normal, lerp, normalize
 
 
 _EDGE_MAP = np.array([.0, .1, .2, .5, .9, 1.1], dtype=np.float64)
@@ -100,7 +100,7 @@ class Terrain(Mesh):
         return color, shininess
 
     def get_normal(self, x: int, z: int) -> npt.NDArray[np.float64]:
-        return self._normals[x * self._x + z]
+        return normalize(self._normals[x * self._x + z])
 
     def get_position(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._position[x * self._x + z]
