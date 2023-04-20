@@ -1,4 +1,4 @@
-import OpenGL.GL as GL              # standard Python OpenGL wrapper
+import OpenGL.GL as GL
 
 from .vertex_array import VertexArray
 

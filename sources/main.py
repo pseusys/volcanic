@@ -1,45 +1,43 @@
-from math import sqrt, floor
+from math import sqrt
 from typing import Dict, Union
 
-from perlin_noise import PerlinNoise
+import numpy as np
 
 from sources.config import read_config
-from sources.custom import terrain_generator
 from sources.heat import Heat
 from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     viewer = Viewer(distance=configs["general"]["distance"])
     shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
-    shader_map = Shader("shaders/phong.vert", "shaders/phong_map.frag")
+    shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
+    shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
 
     limit = configs["general"]["size_limit"]
     heat_state = configs["general"]["heat"]
     average = limit / 2
 
-    noise = PerlinNoise(octaves=configs["terrain"]["perlin_octaves"])
     laplacian_sigma = configs["terrain"]["laplacian_sigma"]
     sigma_radius = configs["terrain"]["sigma_radius"]
 
     island_radius = configs["terrain"]["island_radius"]
 
-    tree_number = configs["trees"]["tree_number"]
-    tree_margin = configs["trees"]["tree_margin"]
-    tree_height = configs["trees"]["tree_height"]
+    tree_number = configs["trees"]["number"]
+    tree_margin = configs["trees"]["margin"]
 
     if average - min(tree_margin, average - island_radius) <= laplacian_sigma * sigma_radius and tree_number > 0:
         print(f"Configuration incorrect! No place for {tree_number} trees!")
         exit(1)
 
-    ice_number = configs["ice"]["ice_number"]
-    ice_margin = configs["ice"]["ice_margin"]
+    ice_number = configs["ice"]["number"]
+    ice_margin = configs["ice"]["margin"]
 
     if average - ice_margin <= island_radius and ice_number > 0:
         print(f"Configuration incorrect! No place for {ice_number} icebergs!")
@@ -52,7 +50,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     generator = terrain_generator(
         lambda x, z: laplacian_of_gaussian(x, z, laplacian_sigma) - square_extended(x, z, shore_size=island_radius),
-        lambda x, z: noise([x, z]),
+        lambda x, z: noise(x, z, configs["terrain"]["perlin_octaves"], configs["terrain"]["perlin_seed"]),
         limit,
         limit,
         configs["terrain"]["carrier_weight"],
@@ -76,14 +74,19 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     if heat.generate_ice:
         icebergs = conditional_random_points(ice_number, in_sea, limit - ice_margin, limit - ice_margin, ice_margin, ice_margin)
         for tx, tz in icebergs:
-            viewer.add(Ice(shader_gen, floor(tx - average), floor(tz - average), configs["water"]["height"]))
+            transform = translate(tx - average, configs["water"]["height"], tz - average)
+            iceberg = Ice(shader_gen, transform)
+            viewer.add(iceberg)
 
     def in_island(x: int, z: int) -> bool:
         return island_radius >= sqrt((x - average) ** 2 + (z - average) ** 2) > laplacian_sigma * sigma_radius
 
     trees = conditional_random_points(tree_number, in_island, limit - tree_margin, limit - tree_margin, tree_margin, tree_margin)
     for tx, tz in trees:
-        viewer.add(Tree(shader_gen, tx, tz, terrain, tree_height, color_map=heat.tree_colors))
+        terrain_normal = terrain.get_normal(tx, tz)
+        transform = translate(terrain.get_position(tx, tz)) @ find_normal_rotation(normal_normal, terrain_normal)
+        tree = Tree(shader_map, heat_state=heat_state, leaf_shader=shader_textured, chrono=chrono, color_map=heat.tree_colors, transform=transform, **configs["trees"])
+        viewer.add(tree)
 
     viewer.run()
 
