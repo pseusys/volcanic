@@ -1,3 +1,4 @@
+from sys import argv
 from math import sqrt
 from typing import Dict, Union
 
@@ -95,4 +96,6 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
 
 if __name__ == '__main__':
-    main(read_config())
+    if len(argv) < 2:
+        print("Configration file name missing!\nPlease, run simulation with 'make run CONF=[confiruration file name]'!")
+    main(read_config(argv[1]))
