@@ -189,14 +189,16 @@ There are a few highlights:
 - Under the `sources/objects` root you will find most of the features/objects like terrain, trees, smoke etc.
 
 ## Possible Extensions
+
 - Birds with Skinning techniques
 - Navigating and controlling a bird flying through the scene
 - Volcanic eruption with flowing lava, that is burning the trees
 - Controlls
 
 ## Difficulties
-- difficult to debug and find the errors
-- sometimes not clear which transform method from what class is used
-- understanding exact functionalities
+
+- Difficult to debug and find the errors
+- Sometimes not clear which transform method from what class is used
+- Understanding exact functionalities
 
 ## Screenshots
