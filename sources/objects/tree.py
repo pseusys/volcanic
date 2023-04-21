@@ -124,7 +124,7 @@ class HotTree(Node):
             rotation = rotate((0, 1, 0), i)
             retransform = translate(0, height, 0)
             rerotate = translate(0, 0, -length / 4)
-            leaf = Image(leaf_shader, leaf_texture, (0, 0, 0), (.3, .3, .3), .1, 1., length, length / 2, retransform @ rotation @ rerotate)
+            leaf = Image(leaf_shader, leaf_texture, (0, 0, 0), (.3, .3, .3), .1, 1., length, length / 2, False, retransform @ rotation @ rerotate)
             self.add(leaf)
 
 
