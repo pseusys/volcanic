@@ -118,7 +118,7 @@ For the hot climate we have bias 0.
 
 ### Birds
 
-🚧 The birds are eunder construction 🚧
+🚧 The birds are under construction 🚧
 
 ## Configurations
 
@@ -200,5 +200,3 @@ There are a few highlights:
 - Difficult to debug and find the errors
 - Sometimes not clear which transform method from what class is used
 - Understanding exact functionalities
-
-## Screenshots
