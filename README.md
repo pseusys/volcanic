@@ -188,4 +188,17 @@ There are a few highlights:
 - Under the `sources/utils` root you will find some helping classes, mostly for calculation (most of them are implemented by us).
 - Under the `sources/objects` root you will find most of the features/objects like terrain, trees, smoke etc.
 
+## Possible Extensions
+
+- Birds with Skinning techniques
+- Navigating and controlling a bird flying through the scene
+- Volcanic eruption with flowing lava, that is burning the trees
+- Controlls
+
+## Difficulties
+
+- Difficult to debug and find the errors
+- Sometimes not clear which transform method from what class is used
+- Understanding exact functionalities
+
 ## Screenshots
