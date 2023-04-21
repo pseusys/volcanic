@@ -12,6 +12,17 @@ from sources.utils import laplacian_of_gaussian, conditional_random_points, squa
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
+    print("""
+    Controls:
+        1. 'SPACEBAR' key: restart the animation time (from 'initial_time' see [configs](#configurations)).
+        2. 'A' or 'LEFT' key: move camera left by one unit.
+        3. 'W' or 'UP' key: move camera up by one unit.
+        4. 'D' or 'RIGHT' key: move camera right by one unit.
+        5. 'S' or 'DOWN' key: move camera down by one unit.
+        6. Mouse wheel scroll: zoom the simulation.
+        7. Mouse drag with right button pressed: move camera in the direction of drag.
+        8. Mouse drag with left button pressed: rotate camera in the direction of drag.
+        """)
     viewer = Viewer(distance=configs["general"]["distance"])
     shader_textured = Shader("shaders/textured.vert", "shaders/textured.frag")
     viewer.set_splash(Image(shader_textured, "assets/splashscreen.jpg", (1, 1, 1), (0, 0, 0), 1., 1., 1., 1., True))
