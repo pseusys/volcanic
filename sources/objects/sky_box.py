@@ -48,7 +48,7 @@ class SkyBox(TexturedCubeMap):
                   (-1, -1, 1))
 
         vertices = front + back + left + right + top + bottom
-        scaled = size * np.array(vertices, np.float32)
+        scaled = np.array(vertices, np.float32)
         cube = Mesh(shader, attributes=dict(position=scaled))
         day_sky = TextureCubeMap(day_texture, day_extension)
         night_sky = TextureCubeMap(night_texture, night_extension)

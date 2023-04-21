@@ -11,7 +11,11 @@ out vec3 tex_coords;
 void main() {
     // initialize interpolated colors at vertices
     tex_coords = position;
+    tex_coords[1] += 0.4;
+
+    mat4 pv = projection * view;
+    pv[3] = vec4(0, 0, 0, 1);
 
     // tell OpenGL how to transform the vertex to clip coordinates
-    gl_Position = projection * view * vec4(position, 1);
+    gl_Position = pv * vec4(position, 1);
 }
