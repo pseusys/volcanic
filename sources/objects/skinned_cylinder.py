@@ -1,16 +1,9 @@
-#!/usr/bin/env python3
+import numpy as np
 
-# Python built-in modules
-import sys
-
-# External, non built-in modules
-import numpy as np                  # all matrix manipulations & OpenGL args
 from sources.utils import identity,sincos, quaternion_from_euler, quaternion, quaternion_slerp, quaternion_matrix, translate, scale
-from sources.wrapper import KeyFrameControlNode, Skinned, Shader, Mesh, Viewer, load
+from sources.wrapper import KeyFrameControlNode, Skinned, Shader, Mesh, Viewer, load, Node
 
 
-
-# -------------- Deformable Cylinder Mesh  ------------------------------------
 class SkinnedCylinder(KeyFrameControlNode):
     """ Deformable cylinder """
     def __init__(self, shader, sections=11, quarters=20, trans=(0,0,0), transform=identity()):
@@ -81,3 +74,7 @@ class SkinnedCylinder(KeyFrameControlNode):
                           bone_ids=bone_id, bone_weights=bone_weights)
         mesh = Mesh(shader, attributes=attributes, index=faces)
         self.add(Skinned(mesh, bone_nodes, bone_offsets))
+
+
+class Bird(Node):
+    pass
