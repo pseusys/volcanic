@@ -8,10 +8,7 @@ uniform vec3 light_pos;
 
 // material properties
 in vec3 w_k_a, w_k_d, w_k_s;
-in float w_s;
-
-// global matrix variables
-uniform mat4 model, view;
+in float w_s, w_a;
 
 // world camera position
 uniform vec3 w_camera_position;
@@ -26,7 +23,7 @@ void main() {
 
     vec3 ambient = w_k_a;
     vec3 material = w_k_d * max(dot(normal_normal, normal_light), 0);
-    vec3 reflect = w_k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * w_s;
+    vec3 reflection = w_k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * w_s;
 
-    out_color = vec4(ambient + material + reflect, 1);
+    out_color = vec4(ambient + material + reflection, w_a);
 }

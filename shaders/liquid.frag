@@ -7,7 +7,7 @@ uniform float time;
 uniform vec2 resolution;
 
 // texture image
-uniform sampler2D texture, normal;
+uniform sampler2D surface, normal;
 
 // waves insensitivity
 uniform float amplitude;
@@ -37,9 +37,6 @@ uniform vec3 light_pos;
 uniform vec3 k_a, k_d, k_s;
 uniform float s;
 
-// global matrix variables
-uniform mat4 model, view;
-
 // world camera position
 uniform vec3 w_camera_position;
 
@@ -52,7 +49,7 @@ void main() {
 
     vec2 waving = (center_pos / center_len) * cos(center_len * distortion - time * speed) * amplitude;
     vec2 uv = w_position.xz / resolution.xy + waving;
-    vec3 col = texture(texture, uv).xyz;
+    vec3 col = texture(surface, uv).xyz;
     vec3 norm = texture(normal, uv).rbg;  
 
     vec3 normal_normal = normalize(norm * 2.0 - 1.0);
@@ -61,7 +58,7 @@ void main() {
 
     vec3 ambient = glowing ? col : k_a;
     vec3 material = (glowing ? k_d : col) * max(dot(normal_normal, normal_light), 0);
-    vec3 reflect = k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * s;
+    vec3 reflection = k_s * pow(max(dot(reflect(normal_light, normal_normal), -normal_view), 0), 16.) * s;
 
-    out_color = vec4(ambient + material + reflect, transparency);
+    out_color = vec4(ambient + material + reflection, transparency);
 }

@@ -2,8 +2,7 @@ import glfw
 import numpy as np
 from OpenGL import GL
 
-from ..wrapper import Shader, Mesh
-from ..wrapper.texture import Texture, Textured
+from ..wrapper import Shader, Mesh, Texture, Textured
 
 
 class Liquid(Textured):
@@ -16,7 +15,7 @@ class Liquid(Textured):
         uniforms = dict(resolution=resolution, amplitude=amplitude, center_shift=center_shift, speed=speed, distortion=distortion, transparency=transparency, glowing=glowing)
         mesh = Mesh(shader, attributes=dict(position=positions), index=indices, **uniforms, **colors)
 
-        super().__init__(mesh, texture=Texture(texture_file), normal=Texture(normal_file))
+        super().__init__(mesh, surface=Texture(texture_file), normal=Texture(normal_file))
 
     def draw(self, primitives=GL.GL_TRIANGLES, **uniforms):
         super().draw(primitives, **uniforms, time=glfw.get_time())
