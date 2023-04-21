@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ..wrapper import Shader, Mesh
-from ..utils import triangle_normal, empty_grid, lerp
+from ..utils import triangle_normal, lerp, normalize
 
 
 _EDGE_MAP = np.array([.0, .1, .2, .5, .9, 1.1], dtype=np.float64)
@@ -29,7 +29,7 @@ class Terrain(Mesh):
 
         # Calculate vertex positions:
 
-        self._position = empty_grid(x=size_x, z=size_z)
+        self._position = [None for _ in range(size_x * size_z)]
         for x in range(size_x):
             for z in range(size_z):
                 self._position[x * size_x + z] = (-size_x // 2 + x, generator(x, z), -size_z // 2 + z)
@@ -38,7 +38,7 @@ class Terrain(Mesh):
         # Calculate triangle indexes together with normals:
 
         index = list()
-        self._normals = empty_grid(x=size_x, z=size_z, init=list)
+        self._normals = [list() for _ in range(size_x * size_z)]
         for x in range(size_x - 1):
             for z in range(size_z - 1):
                 index += self._compute_index_and_normals(x, size_x, z)
@@ -57,17 +57,18 @@ class Terrain(Mesh):
 
         # Calculate material color depending on height
 
-        k_d = empty_grid(x=size_x, z=size_z)
-        s = empty_grid(x=size_x, z=size_z)
+        k_d = [None for _ in range(size_x * size_z)]
+        s = [None for _ in range(size_x * size_z)]
         for idx in range(len(self._position)):
             k_d[idx], s[idx] = self._get_edge_index_fraction(self._position[idx][1], color_map, shiny_map)
 
-        k_a = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (0, 0, 0)), dtype=np.float64)
-        k_s = np.array(empty_grid(x=size_x, z=size_z, init=lambda: (1, 1, 1)), dtype=np.float64)
+        k_a = np.array([(0, 0, 0) for _ in range(size_x * size_z)], dtype=np.float64)
+        k_s = np.array([(1, 1, 1) for _ in range(size_x * size_z)], dtype=np.float64)
+        a = np.array([(1,) for _ in range(size_x * size_z)], dtype=np.float64)
 
         # Set variables
 
-        colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64))
+        colors = dict(k_a=k_a, k_d=np.array(k_d, dtype=np.float64), k_s=k_s, s=np.array(s, dtype=np.float64), a=a)
         attributes = dict(position=self._position, normal=self._normals, **colors)
         super().__init__(shader, index=index, attributes=attributes)
 
@@ -99,7 +100,7 @@ class Terrain(Mesh):
         return color, shininess
 
     def get_normal(self, x: int, z: int) -> npt.NDArray[np.float64]:
-        return self._normals[x * self._x + z]
+        return normalize(self._normals[x * self._x + z])
 
-    def get_height(self, x: int, z: int) -> npt.NDArray[np.float64]:
+    def get_position(self, x: int, z: int) -> npt.NDArray[np.float64]:
         return self._position[x * self._x + z]

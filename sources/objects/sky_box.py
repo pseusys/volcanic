@@ -1,8 +1,11 @@
 from math import cos, pi
+
 import numpy as np
 import OpenGL.GL as GL
+
 from sources.time import Chronograph
 from ..wrapper import TexturedCubeMap, TextureCubeMap, Shader, Mesh
+
 
 class SkyBox(TexturedCubeMap):
     def __init__(self, size, shader: Shader, day_texture: str, day_extension: str, night_texture: str, night_extension: str, chronograph: Chronograph):
