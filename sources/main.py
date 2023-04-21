@@ -19,6 +19,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
+    shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 
@@ -70,10 +71,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     water = Liquid(shader_water, "assets/water_tex.jpg", "assets/water_norm.jpg", round(average), **configs["water"], glowing=False)
     viewer.add(water)
 
-    # Birds
-    shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
     wing_left = SkinnedCylinder(shader_wing, transform=rotate((1, 0, 0), 180))
-    #wing_right = SkinnedCylinder(shader_wing, transform=rotate((0, 1, 0), 180)@rotate((1, 0, 0), 180))   
     viewer.add(wing_left)
 
     def in_sea(x: int, z: int) -> bool:
