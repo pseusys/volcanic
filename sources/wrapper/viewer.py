@@ -1,4 +1,5 @@
 from itertools import cycle         # allows easy circular choice list
+import sys
 
 import glfw                         # lean window system wrapper for OpenGL
 import OpenGL.GL as GL              # standard Python OpenGL wrapper

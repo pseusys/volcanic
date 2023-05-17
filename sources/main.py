@@ -6,10 +6,10 @@ import numpy as np
 
 from sources.config import read_config
 from sources.heat import Heat
-from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke, Image
+from sources.objects import Terrain, Tree, Liquid, Ice, SkyBox, Smoke, Image, SkinnedCylinder
 from sources.time import Chronograph
 from sources.wrapper import Shader, Viewer
-from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal
+from sources.utils import laplacian_of_gaussian, conditional_random_points, square_extended, noise, terrain_generator, translate, find_normal_rotation, normal_normal, rotate
 
 
 def main(configs: Dict[str, Dict[str, Union[int, float]]]):
@@ -20,6 +20,7 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
     shader_gen = Shader("shaders/phong.vert", "shaders/phong.frag")
     shader_map = Shader("shaders/phong_map.vert", "shaders/phong_map.frag")
     shader_smoke = Shader("shaders/phong.vert", "shaders/foggy.frag")
+    shader_wing = Shader("shaders/skinning.vert", "shaders/color.frag")
     shader_water = Shader("shaders/phong.vert", "shaders/liquid.frag")
     shader_cubemap = Shader("shaders/cubemap.vert", "shaders/cubemap.frag")
 
@@ -70,6 +71,9 @@ def main(configs: Dict[str, Dict[str, Union[int, float]]]):
 
     water = Liquid(shader_water, "assets/water_tex.jpg", "assets/water_norm.jpg", round(average), **configs["water"], glowing=False)
     viewer.add(water)
+
+    wing_left = SkinnedCylinder(shader_wing, transform=rotate((1, 0, 0), 180))
+    viewer.add(wing_left)
 
     def in_sea(x: int, z: int) -> bool:
         return sqrt((x - average) ** 2 + (z - average) ** 2) > island_radius + ice_margin
